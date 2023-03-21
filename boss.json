@@ -1,0 +1,9 @@
+{
+  "name": "prometheus-client-delphi",
+  "description": "Delphi Client for Prometheus",
+  "version": "0.1.0",
+  "homepage": "https://github.com/marcobreveglieri/prometheus-client-delphi",
+  "mainsrc": "Source/",
+  "projects": [],
+  "dependencies": {}
+}

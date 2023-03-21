@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{B47049D2-F3BA-413F-92FE-EF4066D88FCA}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Source\Prometheus.Client.Core.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Tests\Prometheus.Client.Tests.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="Prometheus_Client_Core">
+        <MSBuild Projects="Source\Prometheus.Client.Core.dproj"/>
+    </Target>
+    <Target Name="Prometheus_Client_Core:Clean">
+        <MSBuild Projects="Source\Prometheus.Client.Core.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Prometheus_Client_Core:Make">
+        <MSBuild Projects="Source\Prometheus.Client.Core.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Prometheus_Client_Tests">
+        <MSBuild Projects="Tests\Prometheus.Client.Tests.dproj"/>
+    </Target>
+    <Target Name="Prometheus_Client_Tests:Clean">
+        <MSBuild Projects="Tests\Prometheus.Client.Tests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Prometheus_Client_Tests:Make">
+        <MSBuild Projects="Tests\Prometheus.Client.Tests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="Prometheus_Client_Core;Prometheus_Client_Tests"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="Prometheus_Client_Core:Clean;Prometheus_Client_Tests:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="Prometheus_Client_Core:Make;Prometheus_Client_Tests:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
