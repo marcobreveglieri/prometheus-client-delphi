@@ -4,7 +4,7 @@ This is a Delphi client library for [Prometheus](http://prometheus.io), similar 
 
 <br />
 <p align="center">
-  <img alt="Prometheus Client for Delphi" height="128" src="https://github.com/marcobreveglieri/prometheus-client-delphi/Assets/Logo/logo-128.png">
+  <img alt="Prometheus Client for Delphi" height="128" src="https://ucarecdn.com/1d9e8dfd-04e2-48a8-ac57-8849cfdebc49//">
 </p>
 
 ## Overview
