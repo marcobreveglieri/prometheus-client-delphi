@@ -1,4 +1,4 @@
-program Prometheus.Demo.WebBroker;
+program Starter.Sample.WebBroker;
 {$APPTYPE GUI}
 
 uses

@@ -102,7 +102,7 @@ begin
   UpdateLastMinuteMetrics;
   Response.ContentType := 'text/plain';
   Response.ContentStream := TMemoryStream.Create;
-  var LWriter := TTextRenderer.Create;
+  var LWriter := TTextExposer.Create;
   try
     LWriter.Render(Response.ContentStream,
       TCollectorRegistry.DefaultRegistry.Collect);
