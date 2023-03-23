@@ -1,4 +1,4 @@
-unit Prometheus.Renderers;
+unit Prometheus.Exposers.Text;
 
 interface
 

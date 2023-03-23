@@ -113,16 +113,16 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
-        <DCCReference Include="Source\Prometheus.Collector.pas"/>
-        <DCCReference Include="Source\Prometheus.Collectors.Counter.pas"/>
-        <DCCReference Include="Source\Prometheus.Collectors.Gauge.pas"/>
-        <DCCReference Include="Source\Prometheus.Labels.pas"/>
-        <DCCReference Include="Source\Prometheus.Metrics.pas"/>
-        <DCCReference Include="Source\Prometheus.Registry.pas"/>
-        <DCCReference Include="Source\Prometheus.Renderers.pas"/>
-        <DCCReference Include="Source\Prometheus.Resources.pas"/>
-        <DCCReference Include="Source\Prometheus.Samples.pas"/>
-        <DCCReference Include="Source\Prometheus.SimpleCollector.pas"/>
+        <DCCReference Include="Prometheus.Collector.pas"/>
+        <DCCReference Include="Prometheus.Collectors.Counter.pas"/>
+        <DCCReference Include="Prometheus.Collectors.Gauge.pas"/>
+        <DCCReference Include="Prometheus.Labels.pas"/>
+        <DCCReference Include="Prometheus.Metrics.pas"/>
+        <DCCReference Include="Prometheus.Registry.pas"/>
+        <DCCReference Include="Prometheus.Exposers.Text.pas"/>
+        <DCCReference Include="Prometheus.Resources.pas"/>
+        <DCCReference Include="Prometheus.Samples.pas"/>
+        <DCCReference Include="Prometheus.SimpleCollector.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
