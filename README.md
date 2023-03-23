@@ -157,10 +157,25 @@ end.
 
 There are several options for exporting metrics. For example, you can export metrics from a *Windows Service Application* using a **TIdHttp** server component from *Indy Components* and exposing a "/metrics" endpoint where you export text based metrics data to Prometheus server.
 
-You can also download a middleware for your favourite Web framework (***COMING SOON!***) or take a look at the sample projects.
+You can also download a middleware for your favourite Web framework or take a look at the sample projects.
+
+## Middlewares
+
+To ease the use of Prometheus Client inside Web applications created with Delphi, you will find here **middlewares** to download and install.
+
+Each middleware integrates support for exposing metrics to Prometheus server using the appropriate format and without having to code each endpoint manually.
+
+You can find official **Prometheus Client middlewares** into these separate repositories:
+
+| Middleware | Delphi | Lazarus |
+| -------------------------------------------------------------------------------------------------------- | -------------------- | --------------------------- |
+|  [Horse](https://github.com/marcobreveglieri/horse-prometheus-metrics)                                   | &nbsp;&nbsp;&nbsp;✔️ | &nbsp;&nbsp;&nbsp;&nbsp;❌ |
+
+## Delphi compatibility
+
+*Prometheus Client* works with **Delphi 11 Alexandria** as it makes use of advanced features of Delphi language, but with some slight changes it maybe could work in previous versions.
 
 ## Additional links
 
 + [Prometheus Official Page](https://prometheus.io)
 + [Using Delphi with Prometheus and Grafana (in Italian language)](https://www.youtube.com/watch?v=-bPDl6MP6jo)
-
