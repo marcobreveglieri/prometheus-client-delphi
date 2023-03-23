@@ -9,12 +9,12 @@ uses
 
 type
 
-{ TTextRenderer }
+{ TTextExposer }
 
   /// <summary>
   ///  Provides methods to export metrics using the Prometheus text representation.
   /// </summary>
-  TTextRenderer = class
+  TTextExposer = class
   strict private
     function EscapeToken(const AText: string): string;
     function FormatNumber(const AValue: Double): string;
@@ -62,9 +62,9 @@ begin
   SetLength(Result, 0);
 end;
 
-{ TTextRenderer }
+{ TTextExposer }
 
-function TTextRenderer.EscapeToken(const AText: string): string;
+function TTextExposer.EscapeToken(const AText: string): string;
 begin
   Result := AText
     .Replace('\', '\\')
@@ -75,7 +75,7 @@ begin
     .Replace('"', '\"');
 end;
 
-function TTextRenderer.FormatNumber(const AValue: Double): string;
+function TTextExposer.FormatNumber(const AValue: Double): string;
 begin
   if AValue.IsNegativeInfinity then
   begin
@@ -95,7 +95,7 @@ begin
   Result := AValue.ToString;
 end;
 
-function TTextRenderer.Render(ASamples: TArray<TMetricSamples>): string;
+function TTextExposer.Render(ASamples: TArray<TMetricSamples>): string;
 begin
   var LBuffer := TStringBuilder.Create;
   try
@@ -106,7 +106,7 @@ begin
   end;
 end;
 
-procedure TTextRenderer.Render(ABuilder: TStringBuilder; ASamples: TArray<TMetricSamples>);
+procedure TTextExposer.Render(ABuilder: TStringBuilder; ASamples: TArray<TMetricSamples>);
 begin
   var LWriter := TStringWriter.Create(ABuilder);
   try
@@ -116,7 +116,7 @@ begin
   end;
 end;
 
-procedure TTextRenderer.Render(AStream: TStream; ASamples: TArray<TMetricSamples>);
+procedure TTextExposer.Render(AStream: TStream; ASamples: TArray<TMetricSamples>);
 begin
   var LEncoding := TTextEncoding.Create;
   try
@@ -131,7 +131,7 @@ begin
   end;
 end;
 
-procedure TTextRenderer.Render(AWriter: TTextWriter; ASamples: TArray<TMetricSamples>);
+procedure TTextExposer.Render(AWriter: TTextWriter; ASamples: TArray<TMetricSamples>);
 begin
   // TODO: Check output if LMetricSet.Samples == 0
   for var LMetricSet in ASamples do
