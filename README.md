@@ -1,11 +1,10 @@
-# Prometheus Client for Delphi
-
-This is a Delphi client library for [Prometheus](http://prometheus.io), similar to [libraries created for other languages](https://prometheus.io/docs/instrumenting/writing_clientlibs/).
-
+<div>  
+  <img alt="Prometheus Client for Delphi" height="256" src="https://ucarecdn.com/a7019e45-d14b-47cd-8ceb-70ba7848f049/">
+  <h1>Prometheus Client for Delphi</h1>
+</div>
 <br />
-<p align="center">
-  <img alt="Prometheus Client for Delphi" height="128" src="https://ucarecdn.com/a7019e45-d14b-47cd-8ceb-70ba7848f049/">
-</p>
+
+This is a Delphi client library for [Prometheus](http://prometheus.io), similar to [libraries created for other languages](https://prometheus.io/docs/instrumenting/writing_clientlibs/).  
 
 ## Overview
 
@@ -68,6 +67,8 @@ You can export your metrics calling the text based exporter or making use of a r
 
 ## Metrics
 
+Prometheus Delphi Client supports the following metric types.
+
 ### Counter
 
 A **counter** is a cumulative metric that represents a single monotonically increasing counter whose value can only increase or be reset to zero on restart. For example, you can use a counter to represent the number of requests served, tasks completed, or errors.
@@ -120,6 +121,10 @@ Similar to a histogram, a **summary** samples observations (usually things like 
 A **histogram** samples observations (usually things like request durations or response sizes) and counts them in configurable buckets. It also provides a sum of all observed values.
 
 *** !!! Under Development !!! ***
+
+### Custom metrics
+
+You can also implement your own custom metrics by inheriting the appropriate classes (**TCollector** or **TSimpleCollector**).
 
 ## Labels
 
