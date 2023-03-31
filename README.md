@@ -172,9 +172,10 @@ Each middleware integrates support for exposing metrics to Prometheus server usi
 
 You can find official **Prometheus Client middlewares** into these separate repositories:
 
-| Middleware | Delphi | Lazarus |
-| -------------------------------------------------------------------------------------------------------- | -------------------- | --------------------------- |
-|  [Horse](https://github.com/marcobreveglieri/horse-prometheus-metrics)                                   | &nbsp;&nbsp;&nbsp;✔️ | &nbsp;&nbsp;&nbsp;&nbsp;❌ |
+| Middleware |
+| ------------------------------------------------------------------------------------------ |
+|  [Delphi MVC Framework](https://github.com/marcobreveglieri/dmvc-prometheus-metrics)       |
+|  [Horse](https://github.com/marcobreveglieri/horse-prometheus-metrics)                     |
 
 ## Delphi compatibility
 
