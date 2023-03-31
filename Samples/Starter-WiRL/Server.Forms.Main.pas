@@ -1,25 +1,24 @@
-{******************************************************************************}
-{                                                                              }
-{       WiRL: RESTful Library for Delphi                                       }
-{                                                                              }
-{       Copyright (c) 2015-2019 WiRL Team                                      }
-{                                                                              }
-{       https://github.com/delphi-blocks/WiRL                                  }
-{                                                                              }
-{******************************************************************************}
 unit Server.Forms.Main;
 
 interface
 
 uses
-  System.Classes, System.SysUtils, Vcl.Forms, Vcl.ActnList, Vcl.ComCtrls,
-  Vcl.StdCtrls, Vcl.Controls, Vcl.ExtCtrls, System.Diagnostics, System.Actions,
-  WiRL.Core.Engine,
-  WiRL.Core.Application,
-  WiRL.http.Server,
-  WiRL.http.Server.Indy, Vcl.Imaging.pngimage;
+  System.Actions,
+  System.Classes,
+  System.SysUtils,
+  Vcl.Forms,
+  Vcl.ActnList,
+  Vcl.ComCtrls,
+  Vcl.StdCtrls,
+  Vcl.Controls,
+  Vcl.ExtCtrls,
+  Vcl.Imaging.pngimage,
+  WiRL.http.Server;
 
 type
+
+{ TMainForm }
+
   TMainForm = class(TForm)
     TopPanel: TPanel;
     StartServerButton: TButton;
@@ -38,7 +37,6 @@ type
     procedure MainActionListUpdate(Action: TBasicAction; var Handled: Boolean);
   private
     FServer: TWiRLServer;
-  public
   end;
 
 var
@@ -49,10 +47,13 @@ implementation
 {$R *.dfm}
 
 uses
+  WiRL.Core.Engine,
+  WiRL.Core.Application,
+  WiRL.http.Server.Indy,
   Prometheus.Registry,
-  Prometheus.Collectors.Counter,
-  WiRL.Core.JSON,
-  WiRL.Rtti.Utils;
+  Prometheus.Collectors.Counter;
+
+{ TMainForm }
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
@@ -73,39 +74,37 @@ end;
 
 procedure TMainForm.StartServerActionExecute(Sender: TObject);
 begin
-  // Create http server
+  // Create the WiRL HTTP Web Server.
   FServer := TWiRLServer.Create(nil);
 
-  // Server configuration
+  // Set up the server configuration.
   FServer
     .SetPort(StrToIntDef(PortNumberEdit.Text, 8080))
-    // Engine configuration
     .AddEngine<TWiRLEngine>('/rest')
-      .SetEngineName('WiRL ContentType Demo')
+    .SetEngineName('WiRL ContentType Demo')
+    .AddApplication('/app')
+    .SetAppName('Content App')
+    .SetWriters('*')
+    .SetReaders('*')
+    .SetResources('Server.Resources.*');
 
-      // Application configuration
-      .AddApplication('/app')
-        .SetAppName('Content App')
-        .SetWriters('*')
-        .SetReaders('*')
-        .SetResources('Server.Resources.Metrics.TMetricsResource') // metrics!
-        .SetResources('Server.Resources.TSampleResource');
-
-  // Metrics configuration
+  // Create a sample counter metric and register it into the default registry.
   TCounter
-    .Create('http_requests_count', 'Conteggio totale delle richieste HTTP ricevute')
+    .Create('http_requests_count', 'Received HTTP request count', ['path', 'status'])
     .Register();
 
-  // Start the Web server
+  // Start the Web server.
   if not FServer.Active then
     FServer.Active := True;
 end;
 
 procedure TMainForm.StopServerActionExecute(Sender: TObject);
 begin
+  // Turn off the server.
   FServer.Active := False;
   FServer.Free;
-  // Clear metrics
+
+  // Clear all the previously registered metrics to restart from scratch.
   TCollectorRegistry.DefaultRegistry.Clear;
 end;
 

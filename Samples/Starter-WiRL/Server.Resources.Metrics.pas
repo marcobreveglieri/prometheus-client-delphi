@@ -4,13 +4,14 @@ interface
 
 uses
   WiRL.Core.Attributes,
+  WiRL.Core.MessageBody.Default,
   WiRL.http.Accept.MediaType;
 
 type
 
 { TMetricsResource }
 
-  [Path('metrics')]
+  [Path('/metrics')]
   TMetricsResource = class
   public
     [GET, Produces(TMediaType.TEXT_PLAIN)]
@@ -20,19 +21,20 @@ type
 implementation
 
 uses
-  Prometheus.Registry,
   Prometheus.Exposers.Text,
+  Prometheus.Registry,
   WiRL.Core.Registry;
 
 { TMetricsResource }
 
 function TMetricsResource.GetMetrics: string;
 begin
-  var LWriter := TTextExposer.Create;
+  // Export the metrics using Prometheus text format.
+  var LExposer := TTextExposer.Create;
   try
-    Result := LWriter.Render(TCollectorRegistry.DefaultRegistry.Collect);
+    Result := LExposer.Render(TCollectorRegistry.DefaultRegistry.Collect);
   finally
-    LWriter.Free;
+    LExposer.Free;
   end;
 end;
 

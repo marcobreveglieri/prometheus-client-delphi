@@ -122,8 +122,7 @@
         <DCCReference Include="Server.Forms.Main.pas">
             <Form>MainForm</Form>
         </DCCReference>
-        <DCCReference Include="Server.Resources.pas"/>
-        <DCCReference Include="Server.Entities.pas"/>
+        <DCCReference Include="Server.Resources.Samples.pas"/>
         <DCCReference Include="Server.Resources.Metrics.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
