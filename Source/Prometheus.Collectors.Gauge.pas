@@ -4,6 +4,7 @@ interface
 
 uses
   System.SysUtils,
+  Prometheus.Labels,
   Prometheus.Samples,
   Prometheus.SimpleCollector;
 
@@ -16,8 +17,17 @@ type
   /// </summary>
   TGaugeChild = class
   strict private
+    FLock: TObject;
     FValue: Double;
   public
+    /// <summary>
+    ///  Creates a new instance of this gauge collector child.
+    /// </summary>
+    constructor Create;
+    /// <summary>
+    ///  Performs object cleanup releasing all the owned instances.
+    /// </summary>
+    destructor Destroy; override;
     /// <summary>
     ///  Decreases this gauge child by the amount provided.
     /// </summary>
@@ -58,10 +68,20 @@ type
   /// </remarks>
   TGauge = class (TSimpleCollector<TGaugeChild>)
   strict private
+    FLock: TObject;
     function GetValue: Double;
   strict protected
     function CreateChild: TGaugeChild; override;
   public
+    /// <summary>
+    ///  Creates a new instance of this gauge collector.
+    /// </summary>
+    constructor Create(const AName: string; const AHelp: string = '';
+      const ALabelNames: TLabelNames = []); override;
+    /// <summary>
+    ///  Performs object cleanup releasing all the owned instances.
+    /// </summary>
+    destructor Destroy; override;
     /// <summary>
     ///  Collects all the metrics and the samples from this collector.
     /// </summary>
@@ -104,32 +124,44 @@ implementation
 uses
   System.DateUtils,
   System.Diagnostics,
-  Prometheus.Labels,
   Prometheus.Resources;
+
+constructor TGaugeChild.Create;
+begin
+  inherited Create;
+  FLock := TObject.Create;
+end;
+
+destructor TGaugeChild.Destroy;
+begin
+  if Assigned(FLock) then
+    FreeAndNil(FLock);
+  inherited Destroy;
+end;
 
 procedure TGaugeChild.Dec(const AAmount: Double);
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     FValue := FValue - AAmount;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 procedure TGaugeChild.Inc(const AAmount: Double);
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     FValue := FValue + AAmount;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 procedure TGaugeChild.SetDuration(const AProc: TProc);
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     if not Assigned(AProc) then
       raise EArgumentNilException.Create(StrErrNullProcReference);
@@ -141,35 +173,49 @@ begin
       FValue := LStopWatch.Elapsed.TotalMilliseconds;
     end;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 procedure TGaugeChild.SetTo(const AValue: Double);
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     FValue := AValue;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 procedure TGaugeChild.SetToCurrentTime;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     FValue := TDateTime.NowUTC.ToUnix();
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 { TGauge }
 
+constructor TGauge.Create(const AName, AHelp: string;
+  const ALabelNames: TLabelNames);
+begin
+  inherited Create(AName, AHelp, ALabelNames);
+  FLock := TObject.Create;
+end;
+
+destructor TGauge.Destroy;
+begin
+  if Assigned(FLock) then
+    FreeAndNil(FLock);
+  inherited Destroy;
+end;
+
 function TGauge.Collect: TArray<TMetricSamples>;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     SetLength(Result, 1);
     var LMetric := PMetricSamples(@Result[0]);
@@ -191,7 +237,7 @@ begin
       end
     );
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 

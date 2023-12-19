@@ -32,6 +32,7 @@ type
     FChildren: TDictionary<TLabelValues, TChild>;
     FHelp: string;
     FLabelNames: TLabelNames;
+    FLock: TObject;
     FName: string;
     procedure InitializeNoLabelChildIfNeeded();
     function GetChildrenCount: Integer;
@@ -102,6 +103,7 @@ constructor TSimpleCollector<TChild>.Create(const AName: string;
   const AHelp: string = ''; const ALabelNames: TLabelNames = []);
 begin
   inherited Create();
+  FLock := TObject.Create;
   TMetricValidator.CheckName(AName);
   if Length(ALabelNames) > 0 then
     TLabelValidator.CheckLabels(ALabelNames);
@@ -117,6 +119,8 @@ destructor TSimpleCollector<TChild>.Destroy;
 begin
   if Assigned(FChildren) then
     FreeAndNil(FChildren);
+  if Assigned(FLock) then
+    FreeAndNil(FLock);
   inherited Destroy;
 end;
 
@@ -127,52 +131,52 @@ end;
 
 procedure TSimpleCollector<TChild>.EnumChildren(ACallback: TChildrenCallback<TChild>);
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     for var LChild in FChildren do
       ACallback(LChild.Key, LChild.Value);
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 function TSimpleCollector<TChild>.GetChildrenCount: Integer;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     Result := FChildren.Count;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 function TSimpleCollector<TChild>.GetNoLabelChild: TChild;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     if Length(FLabelNames) > 0 then
       raise EInvalidOpException.Create(StrErrCollectorHasLabels);
     InitializeNoLabelChildIfNeeded;
     Result := FChildren.Values.ToArray[0];
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 procedure TSimpleCollector<TChild>.InitializeNoLabelChildIfNeeded;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     if (Length(FLabelNames) <= 0) and (FChildren.Count <= 0) then
       FChildren.Add(nil, CreateChild);
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 function TSimpleCollector<TChild>.Labels(const ALabelValues: TLabelValues): TChild;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     if Length(ALabelValues) <= 0 then
       raise EArgumentException.Create(StrErrLabelValuesMissing);
@@ -190,18 +194,18 @@ begin
       raise;
     end;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 procedure TSimpleCollector<TChild>.Clear;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     FChildren.Clear;
     InitializeNoLabelChildIfNeeded;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
@@ -214,12 +218,12 @@ end;
 
 procedure TSimpleCollector<TChild>.RemoveLabels(const ALabelValues: TLabelValues);
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     FChildren.Remove(ALabelValues);
     InitializeNoLabelChildIfNeeded;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 

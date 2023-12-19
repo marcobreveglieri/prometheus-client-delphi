@@ -3,6 +3,7 @@ unit Prometheus.Collectors.Counter;
 interface
 
 uses
+  Prometheus.Labels,
   Prometheus.Samples,
   Prometheus.SimpleCollector;
 
@@ -15,8 +16,17 @@ type
   /// </summary>
   TCounterChild = class
   strict private
+    FLock: TObject;
     FValue: Double;
   public
+    /// <summary>
+    ///  Creates a new instance of this counter collector child.
+    /// </summary>
+    constructor Create;
+    /// <summary>
+    ///  Performs object cleanup releasing all the owned instances.
+    /// </summary>
+    destructor Destroy; override;
     /// <summary>
     ///  Increases this counter child by the amount provided.
     /// </summary>
@@ -41,10 +51,20 @@ type
   /// </remarks>
   TCounter = class (TSimpleCollector<TCounterChild>)
   strict private
+    FLock: TObject;
     function GetValue: Double;
   strict protected
     function CreateChild: TCounterChild; override;
   public
+    /// <summary>
+    ///  Creates a new instance of this counter collector.
+    /// </summary>
+    constructor Create(const AName: string; const AHelp: string = '';
+      const ALabelNames: TLabelNames = []); override;
+    /// <summary>
+    ///  Performs object cleanup releasing all the owned instances.
+    /// </summary>
+    destructor Destroy; override;
     /// <summary>
     ///  Collects all the metrics and the samples from this collector.
     /// </summary>
@@ -67,28 +87,54 @@ implementation
 
 uses
   System.SysUtils,
-  Prometheus.Labels,
   Prometheus.Resources;
 
 { TCounterChild }
 
+constructor TCounterChild.Create;
+begin
+  inherited Create;
+  FLock := TObject.Create;
+end;
+
+destructor TCounterChild.Destroy;
+begin
+  if Assigned(FLock) then
+    FreeAndNil(FLock);
+  inherited Destroy;
+end;
+
 procedure TCounterChild.Inc(const AAmount: Double);
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     if AAmount <= 0 then
       raise EArgumentOutOfRangeException.Create(StrErrAmountLessThanZero);
     FValue := FValue + AAmount;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 { TCounter }
 
+constructor TCounter.Create(const AName: string; const AHelp: string = '';
+  const ALabelNames: TLabelNames = []);
+begin
+  inherited Create(AName, AHelp, ALabelNames);
+  FLock := TObject.Create;
+end;
+
+destructor TCounter.Destroy;
+begin
+  if Assigned(FLock) then
+    FreeAndNil(FLock);
+  inherited Destroy;
+end;
+
 function TCounter.Collect: TArray<TMetricSamples>;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     SetLength(Result, 1);
     var LMetric := PMetricSamples(@Result[0]);
@@ -110,7 +156,7 @@ begin
       end
     );
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 

@@ -23,6 +23,7 @@ type
   TCollectorRegistry = class
   strict private
     FCollectorsToNames: TDictionary<TCollector, TArray<string>>;
+    FLock: TObject;
     FNamesToCollectors: TDictionary<string, TCollector>;
     class var FDefaultRegistry: TCollectorRegistry;
     class function GetDefaultRegistry: TCollectorRegistry; static;
@@ -88,6 +89,7 @@ begin
     FCollectorsToNames := TObjectDictionary<TCollector, TArray<string>>.Create([doOwnsKeys])
   else
     FCollectorsToNames := TDictionary<TCollector, TArray<string>>.Create;
+  FLock := TObject.Create;
   FNamesToCollectors := TDictionary<string, TCollector>.Create;
 end;
 
@@ -95,6 +97,8 @@ destructor TCollectorRegistry.Destroy;
 begin
   if Assigned(FCollectorsToNames) then
     FreeAndNil(FCollectorsToNames);
+  if Assigned(FLock) then
+    FreeAndNil(FLock);
   if Assigned(FNamesToCollectors) then
     FreeAndNil(FNamesToCollectors);
   inherited Destroy;
@@ -108,18 +112,18 @@ end;
 
 procedure TCollectorRegistry.Clear;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     FCollectorsToNames.Clear;
     FNamesToCollectors.Clear;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 function TCollectorRegistry.Collect: TArray<TMetricSamples>;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     SetLength(Result, 0);
     if FCollectorsToNames.Count <= 0 then
@@ -133,7 +137,7 @@ begin
       LSamples.Free;
     end;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
@@ -141,14 +145,14 @@ function TCollectorRegistry.GetCollector<T>(const AName: string): T;
 var
   LItem: TCollector;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     if FNamesToCollectors.TryGetValue(AName, LItem) then
       Result := T(LItem)
     else
       Result := nil;
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
@@ -161,17 +165,17 @@ end;
 
 function TCollectorRegistry.HasCollector(const AName: string): Boolean;
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     Result := FNamesToCollectors.ContainsKey(AName);
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 procedure TCollectorRegistry.Register(ACollector: TCollector);
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     if not Assigned(ACollector) then
       raise EArgumentException.Create(StrErrNullCollector);
@@ -185,19 +189,19 @@ begin
       FNamesToCollectors.AddOrSetValue(LNameToAdd, ACollector);
     FCollectorsToNames.AddOrSetValue(ACollector, LCollectorNames);
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 procedure TCollectorRegistry.Unregister(ACollector: TCollector);
 begin
-  TMonitor.Enter(Self);
+  TMonitor.Enter(FLock);
   try
     FCollectorsToNames.Remove(ACollector);
     for var LName in ACollector.GetNames do
       FNamesToCollectors.Remove(LName);
   finally
-    TMonitor.Exit(Self);
+    TMonitor.Exit(FLock);
   end;
 end;
 
