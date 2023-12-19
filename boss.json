@@ -1,7 +1,7 @@
 {
 	"name": "prometheus-client-delphi",
 	"description": "Prometheus Client library for Embarcadero Delphi",
-	"version": "0.9.0",
+	"version": "0.9.1",
 	"homepage": "https://www.breveglieri.it/progetti/prometheus-delphi-client",
 	"mainsrc": "./Source",
 	"projects": [],
