@@ -86,11 +86,19 @@ type
     /// <summary>
     ///  Set label values and le label
     /// </summary>
-    function Labels(const ALabelValues: TLabelValues; const AAmount: Double): THistogramChild; reintroduce;
+    function Labels(const ALabelValues: TLabelValues; const LEValue: Double): THistogramChild; reintroduce;
     /// <summary>
     ///  Returns the current value of the default (unlabelled) counter.
     /// </summary>
     property Value: Double read GetValue;
+    /// <summary>
+    ///  Returns the current value of the total count metric.
+    /// </summary>
+    property Count: Double read FCount;
+    /// <summary>
+    ///  Returns the current value of the total sum metric.
+    /// </summary>
+    property Sum: Double read FSum;
   end;
 
 implementation
@@ -219,13 +227,13 @@ begin
   Result := Self;
 end;
 
-function THistogram.Labels(const ALabelValues: TLabelValues; const AAmount: Double): THistogramChild;
+function THistogram.Labels(const ALabelValues: TLabelValues; const LEValue: Double): THistogramChild;
 var
   lLabelValues: TLabelValues;
   lBucketValue: string;
 begin
   lLabelValues := ALabelValues;
-  lBucketValue := Self.GetBucketValue(AAmount);
+  lBucketValue := Self.GetBucketValue(LEValue);
   Insert(lBucketValue, lLabelValues, 0);
   Result := inherited Labels(lLabelValues);
 end;

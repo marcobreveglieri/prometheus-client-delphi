@@ -17,7 +17,8 @@ uses
   DUnitX.TestFramework,
   Prometheus.Tests.Fixtures.Collector in 'Fixtures\Prometheus.Tests.Fixtures.Collector.pas',
   Prometheus.Tests.Fixtures.Collectors.Counter in 'Fixtures\Prometheus.Tests.Fixtures.Collectors.Counter.pas',
-  Prometheus.Tests.Fixtures.Collectors.Gauge in 'Fixtures\Prometheus.Tests.Fixtures.Collectors.Gauge.pas';
+  Prometheus.Tests.Fixtures.Collectors.Gauge in 'Fixtures\Prometheus.Tests.Fixtures.Collectors.Gauge.pas',
+  Prometheus.Tests.Fixtures.Collectors.Histogram in 'Fixtures\Prometheus.Tests.Fixtures.Collectors.Histogram.pas';
 
 begin
 {$IFNDEF TESTINSIGHT}
