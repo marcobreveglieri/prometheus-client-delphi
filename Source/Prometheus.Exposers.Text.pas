@@ -17,7 +17,9 @@ type
   TTextExposer = class
   strict private
     function EscapeToken(const AText: string): string;
+    function VerifyNumberInfiniteOrNan(const AValue: Double): string;
     function FormatNumber(const AValue: Double): string;
+    function FormatNumberDecimal(const AValue: Double): string;
   public
     /// <summary>
     ///  Renders the specified samples as a string.
@@ -77,22 +79,22 @@ end;
 
 function TTextExposer.FormatNumber(const AValue: Double): string;
 begin
-  if AValue.IsNegativeInfinity then
-  begin
-    Result := '-Inf';
-    Exit;
+  Result := VerifyNumberInfiniteOrNan(AValue);
+  if Result = '' then
+    Result := AValue.ToString;
+end;
+
+function TTextExposer.FormatNumberDecimal(const AValue: Double): string;
+var
+  lFormatSettings: TFormatSettings;
+begin
+  Result := VerifyNumberInfiniteOrNan(AValue);
+  if Result = '' then begin
+    lFormatSettings := TFormatSettings.Create;
+    lFormatSettings.DecimalSeparator := '.';
+    lFormatSettings.ThousandSeparator := ',';
+    Result := FloatToStr(AValue, lFormatSettings);
   end;
-  if AValue.IsPositiveInfinity then
-  begin
-    Result := '+Inf';
-    Exit;
-  end;
-  if AValue.IsNan then
-  begin
-    Result := 'Nan';
-    Exit;
-  end;
-  Result := AValue.ToString;
 end;
 
 function TTextExposer.Render(ASamples: TArray<TMetricSamples>): string;
@@ -151,7 +153,7 @@ begin
     AWriter.Write(' ');
     AWriter.Write(LMetricSet.MetricName);
     AWriter.Write(' ');
-    AWriter.Write(LMetricSet.MetricType);
+    AWriter.Write(StrMetricType[LMetricSet.MetricType]);
     AWriter.Write(#10);
 
     // Samples
@@ -189,6 +191,39 @@ begin
       end;
       AWriter.Write(#10);
     end;
+
+    if LMetricSet.MetricType = TMetricType.mtHistogram then begin
+      if LMetricSet.MetricSum > 0.0 then begin
+        AWriter.Write(Format('%s_sum %s', [LMetricSet.MetricName, FormatNumberDecimal(LMetricSet.MetricSum)]));
+        AWriter.Write(#10);
+      end;
+
+      if LMetricSet.MetricCount > 0.0 then begin
+        AWriter.Write(Format('%s_count %s', [LMetricSet.MetricName, FormatNumberDecimal(LMetricSet.MetricCount)]));
+        AWriter.Write(#10);
+      end;
+    end;
+  end;
+end;
+
+function TTextExposer.VerifyNumberInfiniteOrNan(const AValue: Double): string;
+begin
+  Result := '';
+
+  if AValue.IsNegativeInfinity then
+  begin
+    Result := '-Inf';
+    Exit;
+  end;
+  if AValue.IsPositiveInfinity then
+  begin
+    Result := '+Inf';
+    Exit;
+  end;
+  if AValue.IsNan then
+  begin
+    Result := 'Nan';
+    Exit;
   end;
 end;
 

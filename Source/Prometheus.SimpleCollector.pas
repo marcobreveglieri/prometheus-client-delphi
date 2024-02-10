@@ -60,7 +60,7 @@ type
     /// <remarks>
     ///  The count of label values must match the count of label names.
     /// </remarks>
-    function Labels(const ALabelValues: TLabelValues): TChild;
+    function Labels(const ALabelValues: TLabelValues): TChild; virtual;
     /// <summary>
     ///  Remove the metric child for the specified label values.
     /// </summary>

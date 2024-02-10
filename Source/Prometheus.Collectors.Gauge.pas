@@ -221,7 +221,7 @@ begin
     var LMetric := PMetricSamples(@Result[0]);
     LMetric^.MetricName := Self.Name;
     LMetric^.MetricHelp := Self.Help;
-    LMetric^.MetricType := 'gauge';
+    LMetric^.MetricType := TMetricType.mtGauge;
     SetLength(LMetric^.Samples, ChildrenCount);
     var LIndex := 0;
     EnumChildren(
