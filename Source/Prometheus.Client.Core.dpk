@@ -40,6 +40,7 @@ contains
   Prometheus.Exposers.Text in 'Prometheus.Exposers.Text.pas',
   Prometheus.Resources in 'Prometheus.Resources.pas',
   Prometheus.Samples in 'Prometheus.Samples.pas',
-  Prometheus.SimpleCollector in 'Prometheus.SimpleCollector.pas';
+  Prometheus.SimpleCollector in 'Prometheus.SimpleCollector.pas',
+  Prometheus.Collectors.Histogram in 'Prometheus.Collectors.Histogram.pas';
 
 end.
