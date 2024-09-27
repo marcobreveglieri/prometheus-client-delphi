@@ -9,7 +9,7 @@ uses
   IdHTTPWebBrokerBridge,
   WebModules.App in 'WebModules.App.pas' {AppWebModule: TWebModule},
   Controllers.Demo in 'Controllers.Demo.pas',
-  Controllers.Metrics in 'Controllers.Metrics.pas';
+  MVCFramework.Middleware.Metrics in 'MVCFramework.Middleware.Metrics.pas';
 
 {$R *.res}
 

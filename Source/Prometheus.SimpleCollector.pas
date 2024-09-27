@@ -32,11 +32,11 @@ type
     FChildren: TDictionary<TLabelValues, TChild>;
     FHelp: string;
     FLabelNames: TLabelNames;
-    FLock: TObject;
     FName: string;
     procedure InitializeNoLabelChildIfNeeded();
     function GetChildrenCount: Integer;
   strict protected
+    FLock: TObject;
     function CreateChild: TChild; virtual;
     procedure EnumChildren(ACallback: TChildrenCallback<TChild>);
     function GetNoLabelChild: TChild;
