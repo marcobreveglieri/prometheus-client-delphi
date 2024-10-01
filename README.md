@@ -110,15 +110,33 @@ begin
 end.
 ```
 
-### Summary
-
-Similar to a histogram, a **summary** samples observations (usually things like request durations and response sizes). While it also provides a total count of observations and a sum of all observed values, it calculates configurable quantiles over a sliding time window.
-
-*** !!! Under Development !!! ***
-
 ### Histogram
 
 A **histogram** samples observations (usually things like request durations or response sizes) and counts them in configurable buckets. It also provides a sum of all observed values.
+
+```delphi
+uses
+  Prometheus.Collectors.Histogram;
+
+begin
+  lHistogram := TCollectorRegistry.DefaultRegistry.GetCollector<THistogram>('Name of histogram metric');
+  if not Assigned(lHistogram) then begin
+    lHistogram := THistogram.Create('Name of histogram metric');
+    lHistogram.Buckets([]); // default is [0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10, INFINITE]
+    lHistogram.Register;
+  end;
+
+  lHistogram
+    .IncSum(lRequestTimeDec)
+    .IncCount(1)
+    .Labels([], lRequestTimeDec)
+    .Inc;
+end.
+```
+
+### Summary
+
+Similar to a histogram, a **summary** samples observations (usually things like request durations and response sizes). While it also provides a total count of observations and a sum of all observed values, it calculates configurable quantiles over a sliding time window.
 
 *** !!! Under Development !!! ***
 

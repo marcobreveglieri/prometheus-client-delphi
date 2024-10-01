@@ -140,7 +140,7 @@ begin
     var LMetric := PMetricSamples(@Result[0]);
     LMetric^.MetricName := Self.Name;
     LMetric^.MetricHelp := Self.Help;
-    LMetric^.MetricType := 'counter';
+    LMetric^.MetricType := TMetricType.mtCounter;
     SetLength(LMetric^.Samples, ChildrenCount);
     var LIndex := 0;
     EnumChildren(
