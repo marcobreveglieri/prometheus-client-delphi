@@ -28,15 +28,15 @@ type
   ///  and provides all the basic features, like registration and so on.
   /// </summary>
   TSimpleCollector<TChild: class> = class abstract(TCollector)
-  strict private
+  private
     FChildren: TDictionary<TLabelValues, TChild>;
     FHelp: string;
     FLabelNames: TLabelNames;
-    FLock: TObject;
     FName: string;
     procedure InitializeNoLabelChildIfNeeded();
     function GetChildrenCount: Integer;
-  strict protected
+  protected
+    FLock: TObject;
     function CreateChild: TChild; virtual;
     procedure EnumChildren(ACallback: TChildrenCallback<TChild>);
     function GetNoLabelChild: TChild;

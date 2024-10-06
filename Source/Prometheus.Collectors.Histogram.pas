@@ -108,16 +108,16 @@ begin
 end;
 
 function THistogramChild.Observe(AValue: Double): THistogram;
-(* The buckets are cummulative and any value that is less than the upper bound will increment the bucket *)
+(* The buckets are cummulative and any value that is less than - or equal to - the upper bound will increment the bucket *)
 begin
   TMonitor.Enter(FLock);
   try
-    Inc(FBucketValues[0]); (* the smallest bucket is always incremented ! *)
-    for var I := 1 to Length(FBucketValues) - 1 do
+    for var I := Length(FBucketValues) - 1 downto 0 do
     begin
-      if AValue <= FOwner.FBuckets[I - 1] then
+      if AValue <= FOwner.FBuckets[I] then
+        Inc(FBucketValues[I])
+      else
         Break;
-      Inc(FBucketValues[I])
     end;
     Inc(FCount);
     FSum := FSum + AValue;

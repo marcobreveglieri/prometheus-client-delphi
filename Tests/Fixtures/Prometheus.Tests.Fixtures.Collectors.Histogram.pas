@@ -57,6 +57,7 @@ begin
   try
     lHistogram.Observe(0.01);
     lHistogram.Observe(0.04);
+    lHistogram.Observe(0.05);
     lHistogram.Observe(1);
 
     Metrics := lHistogram.Collect;
@@ -64,18 +65,18 @@ begin
     for var  Metric in Metrics do
     begin
       Assert.AreEqual('Sample', Metric.MetricName);
-      Assert.AreEqual(3, Metric.MetricCount, 0);
+      Assert.AreEqual(4, Metric.MetricCount, 0);
 
       for var Sample in Metric.Samples do
       begin
         Assert.AreEqual('Sample_bucket', Sample.MetricName);
         Assert.AreEqual('le', Sample.LabelNames[0]);
         if Sample.LabelValues[0] = '0.025' then
-          Assert.AreEqual(3, Sample.Value, 0);
-        if Sample.LabelValues[0] = '0.05' then
-          Assert.AreEqual(2, Sample.Value, 0);
-        if Sample.LabelValues[0] = '+Inf' then
-          Assert.AreEqual(1, Sample.Value, 0);
+          Assert.AreEqual(1, Sample.Value, 0)
+        else if Sample.LabelValues[0] = '0.05' then
+          Assert.AreEqual(3, Sample.Value, 0)
+        else if Sample.LabelValues[0] = '+Inf' then
+          Assert.AreEqual(4, Sample.Value, 0);
       end;
     end;
   finally

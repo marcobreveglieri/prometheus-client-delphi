@@ -113,7 +113,7 @@
             <DesignClass>TWebModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Controllers.Demo.pas"/>
-        <DCCReference Include="Controllers.Metrics.pas"/>
+        <DCCReference Include="MVCFramework.Middleware.Metrics.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
