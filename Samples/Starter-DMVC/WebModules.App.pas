@@ -67,7 +67,7 @@ begin
       for var I := 0 to Count - 1 do
       begin
         Result[I] := lNextValue;
-        lNextValue := lNextValue + Start;
+        lNextValue := lNextValue + Step;
       end;
     end,
    []).Register();

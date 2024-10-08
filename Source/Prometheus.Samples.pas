@@ -84,7 +84,7 @@ type
     /// <summary>
     ///  The count of all observed processes, used for histogram
     /// </summary>
-    MetricCount: Double;
+    MetricCount: Int64;
   end;
 
 { PMetricSamples }
