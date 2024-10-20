@@ -8,8 +8,7 @@ uses
   Web.WebReq,
   IdHTTPWebBrokerBridge,
   WebModules.App in 'WebModules.App.pas' {AppWebModule: TWebModule},
-  Controllers.Demo in 'Controllers.Demo.pas',
-  MVCFramework.Middleware.Metrics in 'MVCFramework.Middleware.Metrics.pas';
+  Controllers.Demo in 'Controllers.Demo.pas';
 
 {$R *.res}
 

@@ -7,6 +7,7 @@ object AppWebModule: TAppWebModule
       Name = 'DefaultHandler'
       PathInfo = '/'
     end>
-  Height = 230
-  Width = 415
+  Height = 288
+  Width = 519
+  PixelsPerInch = 120
 end
