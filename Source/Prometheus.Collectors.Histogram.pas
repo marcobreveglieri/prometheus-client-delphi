@@ -228,7 +228,6 @@ begin
         LLabelValues[Length(ALabelValues)] := '+Inf';
       LSample^.LabelValues := LLabelValues;
       SetLength(LSample^.LabelValues, Length(LLabelValues));
-      LSample^.TimeStamp := 0;
       LSample^.Value := FValues[LBucketIndex];
     end;
   finally
@@ -263,20 +262,17 @@ constructor THistogram.Create(const AName, AHelp: string;
 begin
   if IndexText(RESERVED_LABEL_NAME, ALabelNames) > -1 then
     raise EInvalidOpException.CreateFmt('Label name ''%s'' is reserved', [RESERVED_LABEL_NAME]);
-
   if Length(ABuckets) > 0 then
     FBuckets := ABuckets
   else
     FBuckets := DEFAULT_BUCKETS;
   TArray.Sort<Double>(FBuckets);
-
   var LBucketCount := Length(FBuckets);
   if FBuckets[LBucketCount - 1] < INFINITE then
   begin
     SetLength(FBuckets, LBucketCount + 1);
     FBuckets[LBucketCount] := INFINITE;
   end;
-
   inherited Create(AName, AHelp, ALabelNames);
 end;
 
@@ -333,7 +329,6 @@ begin
           LSample^.MetricName := Name + '_sum';
           LSample^.LabelNames := LabelNames;
           LSample^.LabelValues := ALabelValues;
-          LSample^.TimeStamp := 0;
           LSample^.Value := AChild.Sum;
           // Add the top level count for the child.
           LStartIndex := Length(LMetric.Samples);
@@ -342,11 +337,11 @@ begin
           LSample^.MetricName := Name + '_count';
           LSample^.LabelNames := LabelNames;
           LSample^.LabelValues := ALabelValues;
-          LSample^.TimeStamp := 0;
           LSample^.Value := AChild.Count;
         end;
         AChild.CollectChild(LMetric^.Samples, ALabelValues);
-      end);
+      end
+    );
   finally
     TMonitor.Exit(Lock);
   end;

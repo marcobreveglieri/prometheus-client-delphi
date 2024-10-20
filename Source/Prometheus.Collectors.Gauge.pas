@@ -207,7 +207,6 @@ begin
         LSample^.MetricName := Self.Name;
         LSample^.LabelNames := Self.LabelNames;
         LSample^.LabelValues := ALabelValues;
-        LSample^.TimeStamp := 0;
         LSample^.Value := AChild.Value;
         System.Inc(LIndex);
       end

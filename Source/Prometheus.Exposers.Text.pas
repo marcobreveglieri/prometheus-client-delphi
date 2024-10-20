@@ -174,13 +174,10 @@ begin
     AWriter.Write(StrMetricType[LMetricSet.MetricType]);
     AWriter.Write(#10);
 
-    // Samples
+    // Metric samples
     for var LSample in LMetricSet.Samples do
     begin
-      // Samples - metric
       AWriter.Write(LSample.MetricName);
-
-      // Samples - label + values
       if LSample.HasLabels then
       begin
         AWriter.Write('{');
@@ -199,27 +196,22 @@ begin
         AWriter.Write('}');
       end;
       AWriter.Write(' ');
-
-      // Samples - total value
       AWriter.Write(FormatNumber(LSample.Value));
-      if LSample.HasTimeStamp then
-      begin
-        AWriter.Write(' ');
-        AWriter.Write(LSample.TimeStamp);
-      end;
       AWriter.Write(#10);
     end;
 
-    if LMetricSet.MetricType = TMetricType.mtHistogram then begin
-      if LMetricSet.MetricSum > 0.0 then begin
+    if LMetricSet.MetricType = TMetricType.mtHistogram then
+    begin
+      if LMetricSet.MetricSum > 0.0 then
+      begin
         AWriter.Write(Format('%s_sum %s', [
           LMetricSet.MetricName,
           FormatDecimal(LMetricSet.MetricSum)
         ]));
         AWriter.Write(#10);
       end;
-
-      if LMetricSet.MetricCount > 0.0 then begin
+      if LMetricSet.MetricCount > 0.0 then
+      begin
         AWriter.Write(Format('%s_count %s', [
           LMetricSet.MetricName,
           FormatDecimal(LMetricSet.MetricCount)

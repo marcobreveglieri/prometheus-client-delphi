@@ -33,10 +33,6 @@ type
     /// </summary>
     LabelValues: TArray<string>;
     /// <summary>
-    ///  The timestamp of this sample.
-    /// </summary>
-    TimeStamp: Int64;
-    /// <summary>
     ///  The current value of this sample.
     /// </summary>
     Value: Double;
@@ -44,10 +40,6 @@ type
     ///  Check if this sample is bound to label names and values.
     /// </summary>
     function HasLabels: Boolean;
-    /// <summary>
-    ///  Check if this sample has a valid timestamp.
-    /// </summary>
-    function HasTimeStamp: Boolean;
   end;
 
 { PSample }
@@ -108,11 +100,6 @@ implementation
 function TSample.HasLabels: Boolean;
 begin
   Result := (Length(LabelNames) > 0) and (Length(LabelValues) > 0);
-end;
-
-function TSample.HasTimeStamp: Boolean;
-begin
-  Result := TimeStamp > 0;
 end;
 
 end.
