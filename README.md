@@ -119,15 +119,12 @@ uses
   Prometheus.Collectors.Histogram;
 
 begin
-  lHistogram := TCollectorRegistry.DefaultRegistry.GetCollector<THistogram>('Name of histogram metric');
-  if not Assigned(lHistogram) then begin
-    lHistogram := THistogram.Create('Name of histogram metric', 'Help text for histogram metric');
-    // if Buckets argument is not supplied, the default values will be used
-    //[0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10, INFINITE]
-    lHistogram.Register;
-  end;
-
-  lHistogram.Observe(lRequestTimeDec);
+  LHistogram := THistogram.Create('Name of histogram metric', 'Help text for histogram metric');
+  // If buckets argument is not supplied, the default values will be used:
+  // [0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10, INFINITE].
+  LHistogram.Observe(0.01);
+  LHistogram.Observe(0.04);
+  LHistogram.Observe(1);
 end.
 ```
 

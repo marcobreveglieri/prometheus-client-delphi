@@ -8,9 +8,11 @@ uses
 
 type
 
-{ TSample }
+{ Enums }
 
   TMetricType = (mtCounter, mtGauge, mtHistogram);
+
+{ TSample }
 
   /// <summary>
   ///  Represents a typical sample that can belong to any metrics and can
@@ -95,7 +97,9 @@ type
   PMetricSamples = ^TMetricSamples;
 
 const
-  StrMetricType: array[TMetricType] of string = ('counter', 'gauge', 'histogram');
+  StrMetricType: array[TMetricType] of string = (
+    'counter', 'gauge', 'histogram'
+  );
 
 implementation
 

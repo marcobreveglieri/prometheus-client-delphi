@@ -28,18 +28,19 @@ type
   ///  and provides all the basic features, like registration and so on.
   /// </summary>
   TSimpleCollector<TChild: class> = class abstract(TCollector)
-  private
+  strict private
     FChildren: TDictionary<TLabelValues, TChild>;
     FHelp: string;
     FLabelNames: TLabelNames;
+    FLock: TObject;
     FName: string;
     procedure InitializeNoLabelChildIfNeeded();
     function GetChildrenCount: Integer;
-  protected
-    FLock: TObject;
+  strict protected
     function CreateChild: TChild; virtual;
     procedure EnumChildren(ACallback: TChildrenCallback<TChild>);
     function GetNoLabelChild: TChild;
+    property Lock: TObject read FLock;
   public
     /// <summary>
     ///  Creates a new instance of this collector.

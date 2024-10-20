@@ -17,9 +17,9 @@ type
   TTextExposer = class
   strict private
     function EscapeToken(const AText: string): string;
-    function VerifyNumberInfiniteOrNan(const AValue: Double): string;
+    function FormatInfiniteOrNaN(const AValue: Double): string;
     function FormatNumber(const AValue: Double): string;
-    function FormatNumberDecimal(const AValue: Double): string;
+    function FormatDecimal(const AValue: Double): string;
   public
     /// <summary>
     ///  Renders the specified samples as a string.
@@ -77,24 +77,42 @@ begin
     .Replace('"', '\"');
 end;
 
+function TTextExposer.FormatInfiniteOrNaN(const AValue: Double): string;
+begin
+  if AValue.IsNegativeInfinity then
+  begin
+    Result := '-Inf';
+    Exit;
+  end;
+  if AValue.IsPositiveInfinity then
+  begin
+    Result := '+Inf';
+    Exit;
+  end;
+  if AValue.IsNan then
+  begin
+    Result := 'Nan';
+    Exit;
+  end;
+  Result := '';
+end;
+
 function TTextExposer.FormatNumber(const AValue: Double): string;
 begin
-  Result := VerifyNumberInfiniteOrNan(AValue);
+  Result := FormatInfiniteOrNaN(AValue);
   if Result = '' then
     Result := AValue.ToString;
 end;
 
-function TTextExposer.FormatNumberDecimal(const AValue: Double): string;
-var
-  lFormatSettings: TFormatSettings;
+function TTextExposer.FormatDecimal(const AValue: Double): string;
 begin
-  Result := VerifyNumberInfiniteOrNan(AValue);
-  if Result = '' then begin
-    lFormatSettings := TFormatSettings.Create;
-    lFormatSettings.DecimalSeparator := '.';
-    lFormatSettings.ThousandSeparator := ',';
-    Result := FloatToStr(AValue, lFormatSettings);
-  end;
+  Result := FormatInfiniteOrNaN(AValue);
+  if Result <> '' then
+    Exit;
+  var LFormatSettings := TFormatSettings.Create;
+  LFormatSettings.DecimalSeparator := '.';
+  LFormatSettings.ThousandSeparator := ',';
+  Result := FloatToStr(AValue, LFormatSettings);
 end;
 
 function TTextExposer.Render(ASamples: TArray<TMetricSamples>): string;
@@ -135,7 +153,7 @@ end;
 
 procedure TTextExposer.Render(AWriter: TTextWriter; ASamples: TArray<TMetricSamples>);
 begin
-  // TODO: Check output if LMetricSet.Samples == 0
+  // TODO: Check output if LMetricSet.Samples == 0 -NdMarco
   for var LMetricSet in ASamples do
   begin
     // Metric help
@@ -194,36 +212,21 @@ begin
 
     if LMetricSet.MetricType = TMetricType.mtHistogram then begin
       if LMetricSet.MetricSum > 0.0 then begin
-        AWriter.Write(Format('%s_sum %s', [LMetricSet.MetricName, FormatNumberDecimal(LMetricSet.MetricSum)]));
+        AWriter.Write(Format('%s_sum %s', [
+          LMetricSet.MetricName,
+          FormatDecimal(LMetricSet.MetricSum)
+        ]));
         AWriter.Write(#10);
       end;
 
       if LMetricSet.MetricCount > 0.0 then begin
-        AWriter.Write(Format('%s_count %s', [LMetricSet.MetricName, FormatNumberDecimal(LMetricSet.MetricCount)]));
+        AWriter.Write(Format('%s_count %s', [
+          LMetricSet.MetricName,
+          FormatDecimal(LMetricSet.MetricCount)
+        ]));
         AWriter.Write(#10);
       end;
     end;
-  end;
-end;
-
-function TTextExposer.VerifyNumberInfiniteOrNan(const AValue: Double): string;
-begin
-  Result := '';
-
-  if AValue.IsNegativeInfinity then
-  begin
-    Result := '-Inf';
-    Exit;
-  end;
-  if AValue.IsPositiveInfinity then
-  begin
-    Result := '+Inf';
-    Exit;
-  end;
-  if AValue.IsNan then
-  begin
-    Result := 'Nan';
-    Exit;
   end;
 end;
 

@@ -7,165 +7,171 @@ uses
 
 type
 
-{ TCollectorTestFixture }
+{ THistogramCollectorTestFixture }
 
   [TestFixture]
   THistogramCollectorTestFixture = class
-  private
   public
     [Test]
-    procedure BucketsMustStartAtZero;
+    procedure HistogramBucketsMustBeSorted;
     [Test]
-    procedure CounterAndSumMustStartAtZero;
+    procedure HistogramBucketsMustIncrementBySpecifiedAmount;
     [Test]
-    procedure BucketsMustBeSorted;
+    procedure HistogramBucketsMustStartAtZero;
     [Test]
-    procedure HistogramMustThrowExceptionIfUseReservedLabelName;
+    procedure HistogramCountMustIncrementBySpecifiedAmount;
     [Test]
-    procedure BucketsMustIncrementBySpecifiedAmount;
+    procedure HistogramCountMustStartAtZero;
     [Test]
-    procedure SumMustIncrementBySpecifiedAmount;
+    procedure HistogramLabelMustThrowExceptionIfUseReservedName;
+    [Test]
+    procedure HistogramSumMustIncrementBySpecifiedAmount;
+    [Test]
+    procedure HistogramSumMustStartAtZero;
   end;
 
 implementation
 
 uses
   System.SysUtils,
-  Prometheus.Collectors.Histogram, Prometheus.Samples, Prometheus.Labels;
+  Prometheus.Collectors.Histogram;
 
 { THistogramCollectorTestFixture }
 
-
-procedure THistogramCollectorTestFixture.BucketsMustBeSorted;
-var
-  lHistogram: THistogram;
+procedure THistogramCollectorTestFixture.HistogramBucketsMustBeSorted;
 begin
-  lHistogram := THistogram.Create('Sample', '', [2, 0.5, 1]);
-  Assert.AreEqual(4, Length(lHistogram.Buckets));
-  Assert.AreEqual(0.5, lHistogram.Buckets[0], Double.Epsilon);
-  Assert.AreEqual(1, lHistogram.Buckets[1], Double.Epsilon);
-  Assert.AreEqual(2, lHistogram.Buckets[2], Double.Epsilon);
-  Assert.AreEqual(INFINITE, lHistogram.Buckets[3], Double.Epsilon);
+  var LHistogram := THistogram.Create('Sample', '', [2, 0.5, 1]);
+  try
+    Assert.AreEqual(4, Length(LHistogram.Buckets));
+    Assert.AreEqual(0.5, LHistogram.Buckets[0], Double.Epsilon);
+    Assert.AreEqual(1.0, LHistogram.Buckets[1], Double.Epsilon);
+    Assert.AreEqual(2.0, LHistogram.Buckets[2], Double.Epsilon);
+    Assert.AreEqual(INFINITE, LHistogram.Buckets[3], Double.Epsilon);
+  finally
+    LHistogram.Free;
+  end;
 end;
 
-procedure THistogramCollectorTestFixture.BucketsMustIncrementBySpecifiedAmount;
-var
-  lHistogram: THistogram;
-  Metrics: TArray<TMetricSamples>;
+procedure THistogramCollectorTestFixture.HistogramBucketsMustIncrementBySpecifiedAmount;
 begin
-  lHistogram := THistogram.Create('Sample', '', [0.025, 0.05]);
+  var LHistogram := THistogram.Create('Sample', '', [0.025, 0.05]);
   try
-    lHistogram.Observe(0.01);
-    lHistogram.Observe(0.04);
-    lHistogram.Observe(0.05);
-    lHistogram.Observe(1);
+    LHistogram.Observe(0.01);
+    LHistogram.Observe(0.04);
+    LHistogram.Observe(0.05);
+    LHistogram.Observe(1);
 
-    Metrics := lHistogram.Collect;
-    Assert.AreEqual(1, Length( Metrics));
-    for var  Metric in Metrics do
+    var LMetricArray := LHistogram.Collect;
+    Assert.AreEqual(1, Length( LMetricArray));
+
+    for var LMetric in LMetricArray do
     begin
-      Assert.AreEqual('Sample', Metric.MetricName);
-      Assert.AreEqual(4, Metric.MetricCount, 0);
+      Assert.AreEqual('Sample', LMetric.MetricName);
+      Assert.AreEqual(4, LMetric.MetricCount, 0);
 
-      for var Sample in Metric.Samples do
+      for var LSample in LMetric.Samples do
       begin
-        Assert.AreEqual('Sample_bucket', Sample.MetricName);
-        Assert.AreEqual('le', Sample.LabelNames[0]);
-        if Sample.LabelValues[0] = '0.025' then
-          Assert.AreEqual(1, Sample.Value, 0)
-        else if Sample.LabelValues[0] = '0.05' then
-          Assert.AreEqual(3, Sample.Value, 0)
-        else if Sample.LabelValues[0] = '+Inf' then
-          Assert.AreEqual(4, Sample.Value, 0);
+        Assert.AreEqual('Sample_bucket', LSample.MetricName);
+        Assert.AreEqual('le', LSample.LabelNames[0]);
+        if LSample.LabelValues[0] = '0.025' then
+          Assert.AreEqual(1, LSample.Value, 0)
+        else if LSample.LabelValues[0] = '0.05' then
+          Assert.AreEqual(3, LSample.Value, 0)
+        else if LSample.LabelValues[0] = '+Inf' then
+          Assert.AreEqual(4, LSample.Value, 0);
       end;
     end;
   finally
-    lHistogram.Free;
+    LHistogram.Free;
   end;
 end;
 
-procedure THistogramCollectorTestFixture.SumMustIncrementBySpecifiedAmount;
-var
-  lHistogram: THistogram;
+procedure THistogramCollectorTestFixture.HistogramBucketsMustStartAtZero;
 begin
-  lHistogram := THistogram.Create('Sample', '', [0.025, 0.05]);
+  var LHistogram := THistogram.Create('Sample', '', [0.025, 0.05]);
   try
-    lHistogram.Observe(0.01);
-    lHistogram.Observe(0.04);
-    lHistogram.Observe(1);
-    Assert.AreEqual(3, lHistogram.Count, 0);
-    Assert.AreEqual(1.05,  lHistogram.Sum  ,0);
-  finally
-    lHistogram.Free;
-  end;
-end;
+    var LMetricArray := LHistogram.Collect;
 
-
-procedure THistogramCollectorTestFixture.BucketsMustStartAtZero;
-var
-  lHistogram: THistogram;
-  Metrics: TArray<TMetricSamples>;
-begin
-  lHistogram := THistogram.Create('Sample', '', [0.025, 0.05]);
-  try
-    Metrics := lHistogram.Collect;
-
-    Assert.AreEqual(1, Length( Metrics));
-    for var  Metric in Metrics do
+    Assert.AreEqual(1, Length( LMetricArray));
+    for var LMetric in LMetricArray do
     begin
-      Assert.AreEqual('Sample', Metric.MetricName);
-      Assert.AreEqual(0, Metric.MetricCount, 0);
-      for var Sample in Metric.Samples do
+      Assert.AreEqual('Sample', LMetric.MetricName);
+      Assert.AreEqual(0, LMetric.MetricCount, 0);
+      for var LSample in LMetric.Samples do
       begin
-        Assert.AreEqual('Sample_bucket', Sample.MetricName);
-        Assert.AreEqual('le', Sample.LabelNames[0]);
-        if Sample.LabelValues[0] = '0.025' then
-          Assert.AreEqual(0, Sample.Value, 0);
-        if Sample.LabelValues[0] = '0.05' then
-          Assert.AreEqual(0, Sample.Value, 0);
-        if Sample.LabelValues[0] = '+Inf' then
-          Assert.AreEqual(0, Sample.Value, 0);
+        Assert.AreEqual('Sample_bucket', LSample.MetricName);
+        Assert.AreEqual('le', LSample.LabelNames[0]);
+        if LSample.LabelValues[0] = '0.025' then
+          Assert.AreEqual(0, LSample.Value, 0);
+        if LSample.LabelValues[0] = '0.05' then
+          Assert.AreEqual(0, LSample.Value, 0);
+        if LSample.LabelValues[0] = '+Inf' then
+          Assert.AreEqual(0, LSample.Value, 0);
       end;
     end;
   finally
-    lHistogram.Free;
+    LHistogram.Free;
   end;
 end;
 
-procedure THistogramCollectorTestFixture.CounterAndSumMustStartAtZero;
-var
-  lHistogram: THistogram;
+procedure THistogramCollectorTestFixture.HistogramCountMustIncrementBySpecifiedAmount;
 begin
-  lHistogram := THistogram.Create('Sample');
+  var LHistogram := THistogram.Create('Sample', '', [0.025, 0.05]);
   try
-    Assert.AreEqual(0, lHistogram.Count, Double.Epsilon);
-    Assert.AreEqual(0, lHistogram.Sum, Double.Epsilon);
+    LHistogram.Observe(0.01);
+    LHistogram.Observe(0.04);
+    LHistogram.Observe(1);
+    Assert.AreEqual(3, LHistogram.Count, 0);
   finally
-    lHistogram.Free;
+    LHistogram.Free;
   end;
 end;
 
+procedure THistogramCollectorTestFixture.HistogramCountMustStartAtZero;
+begin
+  var LHistogram := THistogram.Create('Sample');
+  try
+    Assert.AreEqual(0, LHistogram.Count, Double.Epsilon);
+  finally
+    LHistogram.Free;
+  end;
+end;
 
-procedure THistogramCollectorTestFixture.HistogramMustThrowExceptionIfUseReservedLabelName;
-var
-  lHistogram: THistogram;
+procedure THistogramCollectorTestFixture.HistogramLabelMustThrowExceptionIfUseReservedName;
 begin
   Assert.WillRaise(
   procedure
   begin
-    try
-      lHistogram := THistogram.Create('Sample', '', [],   ['le']);
-    finally
-      lHistogram.Free;
-    end;
-  end, EInvalidOpException);
+    THistogram.Create('Sample', '', [],   ['le']);
+  end,
+  EInvalidOpException);
 end;
 
+procedure THistogramCollectorTestFixture.HistogramSumMustIncrementBySpecifiedAmount;
+begin
+  var LHistogram := THistogram.Create('Sample', '', [0.025, 0.05]);
+  try
+    LHistogram.Observe(0.01);
+    LHistogram.Observe(0.04);
+    LHistogram.Observe(1);
+    Assert.AreEqual(1.05,  LHistogram.Sum  ,0);
+  finally
+    LHistogram.Free;
+  end;
+end;
 
+procedure THistogramCollectorTestFixture.HistogramSumMustStartAtZero;
+begin
+  var LHistogram := THistogram.Create('Sample');
+  try
+    Assert.AreEqual(0, LHistogram.Sum, Double.Epsilon);
+  finally
+    LHistogram.Free;
+  end;
+end;
 
 initialization
 
   TDUnitX.RegisterTestFixture(THistogramCollectorTestFixture);
 
 end.
-
