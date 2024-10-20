@@ -8,6 +8,10 @@ uses
 
 type
 
+{ Enums }
+
+  TMetricType = (mtCounter, mtGauge, mtHistogram);
+
 { TSample }
 
   /// <summary>
@@ -70,11 +74,19 @@ type
     /// <summary>
     ///  The type of the metric.
     /// </summary>
-    MetricType: string;
+    MetricType: TMetricType;
     /// <summary>
     ///  The set of samples collected for the metric.
     /// </summary>
     Samples: TArray<TSample>;
+    /// <summary>
+    ///  The sum off all metrics values, used for histogram
+    /// </summary>
+    MetricSum: Double;
+    /// <summary>
+    ///  The count of all observed processes, used for histogram
+    /// </summary>
+    MetricCount: Int64;
   end;
 
 { PMetricSamples }
@@ -83,6 +95,11 @@ type
   ///  Represents a pointer to a set of metric samples.
   /// </summary>
   PMetricSamples = ^TMetricSamples;
+
+const
+  StrMetricType: array[TMetricType] of string = (
+    'counter', 'gauge', 'histogram'
+  );
 
 implementation
 

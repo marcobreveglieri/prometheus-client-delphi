@@ -110,15 +110,27 @@ begin
 end.
 ```
 
-### Summary
-
-Similar to a histogram, a **summary** samples observations (usually things like request durations and response sizes). While it also provides a total count of observations and a sum of all observed values, it calculates configurable quantiles over a sliding time window.
-
-*** !!! Under Development !!! ***
-
 ### Histogram
 
 A **histogram** samples observations (usually things like request durations or response sizes) and counts them in configurable buckets. It also provides a sum of all observed values.
+
+```delphi
+uses
+  Prometheus.Collectors.Histogram;
+
+begin
+  LHistogram := THistogram.Create('Name of histogram metric', 'Help text for histogram metric');
+  // If buckets argument is not supplied, the default values will be used:
+  // [0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10, INFINITE].
+  LHistogram.Observe(0.01);
+  LHistogram.Observe(0.04);
+  LHistogram.Observe(1);
+end.
+```
+
+### Summary
+
+Similar to a histogram, a **summary** samples observations (usually things like request durations and response sizes). While it also provides a total count of observations and a sum of all observed values, it calculates configurable quantiles over a sliding time window.
 
 *** !!! Under Development !!! ***
 
@@ -185,3 +197,4 @@ You can find official **Prometheus Client middlewares** into these separate repo
 
 + [Prometheus Official Page](https://prometheus.io)
 + [Using Delphi with Prometheus and Grafana (in Italian language)](https://www.youtube.com/watch?v=-bPDl6MP6jo)
+

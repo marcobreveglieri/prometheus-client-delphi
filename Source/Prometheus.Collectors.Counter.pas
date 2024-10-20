@@ -51,20 +51,10 @@ type
   /// </remarks>
   TCounter = class (TSimpleCollector<TCounterChild>)
   strict private
-    FLock: TObject;
     function GetValue: Double;
   strict protected
     function CreateChild: TCounterChild; override;
   public
-    /// <summary>
-    ///  Creates a new instance of this counter collector.
-    /// </summary>
-    constructor Create(const AName: string; const AHelp: string = '';
-      const ALabelNames: TLabelNames = []); override;
-    /// <summary>
-    ///  Performs object cleanup releasing all the owned instances.
-    /// </summary>
-    destructor Destroy; override;
     /// <summary>
     ///  Collects all the metrics and the samples from this collector.
     /// </summary>
@@ -118,29 +108,15 @@ end;
 
 { TCounter }
 
-constructor TCounter.Create(const AName: string; const AHelp: string = '';
-  const ALabelNames: TLabelNames = []);
-begin
-  inherited Create(AName, AHelp, ALabelNames);
-  FLock := TObject.Create;
-end;
-
-destructor TCounter.Destroy;
-begin
-  if Assigned(FLock) then
-    FreeAndNil(FLock);
-  inherited Destroy;
-end;
-
 function TCounter.Collect: TArray<TMetricSamples>;
 begin
-  TMonitor.Enter(FLock);
+  TMonitor.Enter(Lock);
   try
     SetLength(Result, 1);
     var LMetric := PMetricSamples(@Result[0]);
     LMetric^.MetricName := Self.Name;
     LMetric^.MetricHelp := Self.Help;
-    LMetric^.MetricType := 'counter';
+    LMetric^.MetricType := TMetricType.mtCounter;
     SetLength(LMetric^.Samples, ChildrenCount);
     var LIndex := 0;
     EnumChildren(
@@ -156,7 +132,7 @@ begin
       end
     );
   finally
-    TMonitor.Exit(FLock);
+    TMonitor.Exit(Lock);
   end;
 end;
 

@@ -40,6 +40,7 @@ type
     function CreateChild: TChild; virtual;
     procedure EnumChildren(ACallback: TChildrenCallback<TChild>);
     function GetNoLabelChild: TChild;
+    property Lock: TObject read FLock;
   public
     /// <summary>
     ///  Creates a new instance of this collector.
