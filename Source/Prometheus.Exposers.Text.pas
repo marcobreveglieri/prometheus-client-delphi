@@ -17,9 +17,9 @@ type
   TTextExposer = class
   strict private
     function EscapeToken(const AText: string): string;
-    function FormatInfiniteOrNaN(const AValue: Double): string;
+    function VerifyNumberInfiniteOrNan(const AValue: Double): string;
     function FormatNumber(const AValue: Double): string;
-    function FormatDecimal(const AValue: Double): string;
+    function FormatNumberDecimal(const AValue: Double): string;
   public
     /// <summary>
     ///  Renders the specified samples as a string.
@@ -77,42 +77,24 @@ begin
     .Replace('"', '\"');
 end;
 
-function TTextExposer.FormatInfiniteOrNaN(const AValue: Double): string;
-begin
-  if AValue.IsNegativeInfinity then
-  begin
-    Result := '-Inf';
-    Exit;
-  end;
-  if AValue.IsPositiveInfinity then
-  begin
-    Result := '+Inf';
-    Exit;
-  end;
-  if AValue.IsNan then
-  begin
-    Result := 'Nan';
-    Exit;
-  end;
-  Result := '';
-end;
-
 function TTextExposer.FormatNumber(const AValue: Double): string;
 begin
-  Result := FormatInfiniteOrNaN(AValue);
+  Result := VerifyNumberInfiniteOrNan(AValue);
   if Result = '' then
     Result := AValue.ToString;
 end;
 
-function TTextExposer.FormatDecimal(const AValue: Double): string;
+function TTextExposer.FormatNumberDecimal(const AValue: Double): string;
+var
+  lFormatSettings: TFormatSettings;
 begin
-  Result := FormatInfiniteOrNaN(AValue);
-  if Result <> '' then
-    Exit;
-  var LFormatSettings := TFormatSettings.Create;
-  LFormatSettings.DecimalSeparator := '.';
-  LFormatSettings.ThousandSeparator := ',';
-  Result := FloatToStr(AValue, LFormatSettings);
+  Result := VerifyNumberInfiniteOrNan(AValue);
+  if Result = '' then begin
+    lFormatSettings := TFormatSettings.Create;
+    lFormatSettings.DecimalSeparator := '.';
+    lFormatSettings.ThousandSeparator := ',';
+    Result := FloatToStr(AValue, lFormatSettings);
+  end;
 end;
 
 function TTextExposer.Render(ASamples: TArray<TMetricSamples>): string;
@@ -153,7 +135,7 @@ end;
 
 procedure TTextExposer.Render(AWriter: TTextWriter; ASamples: TArray<TMetricSamples>);
 begin
-  // TODO: Check output if LMetricSet.Samples == 0 -NdMarco
+  // TODO: Check output if LMetricSet.Samples == 0
   for var LMetricSet in ASamples do
   begin
     // Metric help
@@ -174,10 +156,13 @@ begin
     AWriter.Write(StrMetricType[LMetricSet.MetricType]);
     AWriter.Write(#10);
 
-    // Metric samples
+    // Samples
     for var LSample in LMetricSet.Samples do
     begin
+      // Samples - metric
       AWriter.Write(LSample.MetricName);
+
+      // Samples - label + values
       if LSample.HasLabels then
       begin
         AWriter.Write('{');
@@ -196,29 +181,59 @@ begin
         AWriter.Write('}');
       end;
       AWriter.Write(' ');
+
+      // Samples - total value
       AWriter.Write(FormatNumber(LSample.Value));
+      if LSample.HasTimeStamp then
+      begin
+        AWriter.Write(' ');
+        AWriter.Write(LSample.TimeStamp);
+      end;
       AWriter.Write(#10);
     end;
 
-    if LMetricSet.MetricType = TMetricType.mtHistogram then
-    begin
-      if LMetricSet.MetricSum > 0.0 then
-      begin
-        AWriter.Write(Format('%s_sum %s', [
-          LMetricSet.MetricName,
-          FormatDecimal(LMetricSet.MetricSum)
-        ]));
+    if LMetricSet.MetricType = TMetricType.mtHistogram then begin
+      if LMetricSet.MetricSum > 0.0 then begin
+        AWriter.Write(Format('%s_sum %s', [LMetricSet.MetricName, FormatNumberDecimal(LMetricSet.MetricSum)]));
+        if LMetricSet.HasTimeStamp then
+        begin
+          AWriter.Write(' ');
+          AWriter.Write(LMetricSet.TimeStamp);
+        end;
         AWriter.Write(#10);
       end;
-      if LMetricSet.MetricCount > 0.0 then
-      begin
-        AWriter.Write(Format('%s_count %s', [
-          LMetricSet.MetricName,
-          FormatDecimal(LMetricSet.MetricCount)
-        ]));
+
+      if LMetricSet.MetricCount > 0.0 then begin
+        AWriter.Write(Format('%s_count %s', [LMetricSet.MetricName, FormatNumberDecimal(LMetricSet.MetricCount)]));
+        if LMetricSet.HasTimeStamp then
+        begin
+          AWriter.Write(' ');
+          AWriter.Write(LMetricSet.TimeStamp);
+        end;
         AWriter.Write(#10);
       end;
     end;
+  end;
+end;
+
+function TTextExposer.VerifyNumberInfiniteOrNan(const AValue: Double): string;
+begin
+  Result := '';
+
+  if AValue.IsNegativeInfinity then
+  begin
+    Result := '-Inf';
+    Exit;
+  end;
+  if AValue.IsPositiveInfinity then
+  begin
+    Result := '+Inf';
+    Exit;
+  end;
+  if AValue.IsNan then
+  begin
+    Result := 'Nan';
+    Exit;
   end;
 end;
 

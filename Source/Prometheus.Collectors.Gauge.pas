@@ -8,6 +8,9 @@ uses
   Prometheus.Samples,
   Prometheus.SimpleCollector;
 
+const
+  SECS_TO_MILLISECS = 1000;
+
 type
 
 { TGaugeChild }
@@ -68,10 +71,20 @@ type
   /// </remarks>
   TGauge = class (TSimpleCollector<TGaugeChild>)
   strict private
+    FLock: TObject;
     function GetValue: Double;
   strict protected
     function CreateChild: TGaugeChild; override;
   public
+    /// <summary>
+    ///  Creates a new instance of this gauge collector.
+    /// </summary>
+    constructor Create(const AName: string; const AHelp: string = '';
+      const ALabelNames: TLabelNames = []); override;
+    /// <summary>
+    ///  Performs object cleanup releasing all the owned instances.
+    /// </summary>
+    destructor Destroy; override;
     /// <summary>
     ///  Collects all the metrics and the samples from this collector.
     /// </summary>
@@ -189,9 +202,23 @@ end;
 
 { TGauge }
 
+constructor TGauge.Create(const AName, AHelp: string;
+  const ALabelNames: TLabelNames);
+begin
+  inherited Create(AName, AHelp, ALabelNames);
+  FLock := TObject.Create;
+end;
+
+destructor TGauge.Destroy;
+begin
+  if Assigned(FLock) then
+    FreeAndNil(FLock);
+  inherited Destroy;
+end;
+
 function TGauge.Collect: TArray<TMetricSamples>;
 begin
-  TMonitor.Enter(Lock);
+  TMonitor.Enter(FLock);
   try
     SetLength(Result, 1);
     var LMetric := PMetricSamples(@Result[0]);
@@ -207,12 +234,13 @@ begin
         LSample^.MetricName := Self.Name;
         LSample^.LabelNames := Self.LabelNames;
         LSample^.LabelValues := ALabelValues;
+        LSample^.TimeStamp := DateTimeToUnix(TTimeZone.Local.ToUniversalTime(Now)) * SECS_TO_MILLISECS;
         LSample^.Value := AChild.Value;
         System.Inc(LIndex);
       end
     );
   finally
-    TMonitor.Exit(Lock);
+    TMonitor.Exit(FLock);
   end;
 end;
 

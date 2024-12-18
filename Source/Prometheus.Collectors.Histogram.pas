@@ -3,12 +3,15 @@ unit Prometheus.Collectors.Histogram;
 interface
 
 uses
+  System.StrUtils,
+  System.SysUtils,
+  System.Generics.Collections,
+  System.DateUtils,
   Prometheus.Labels,
   Prometheus.Samples,
   Prometheus.SimpleCollector;
 
 type
-
 { TBuckets }
 
   TBuckets = TArray<Double>;
@@ -16,37 +19,30 @@ type
 { Consts }
 
 const
-
-  /// <summary>
-  ///  Default histogram buckets.
-  /// </summary>
   DEFAULT_BUCKETS: TBuckets = [
     0.005, 0.01, 0.025, 0.05, 0.075, 0.1,
     0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10,
     INFINITE
   ];
+  SECS_TO_MILLISECS = 1000;
 
 type
-
-{ Forward class declarations }
-
   THistogram = class;
 
-{ THistogramChild }
-
   /// <summary>
-  ///  Represents a histogram data collection for a given label combination.
+  ///  Histogram Data Collection for a given label combination
   /// </summary>
   /// <remarks>
-  ///  Includes the individual "bucket" values for the specified labels.
+  ///  Includes the individual "Bucket" values for the specified labels
   /// <remarks>
   THistogramChild = class
-  strict private
+  private
     FOwner: THistogram;
     FLock: TObject;
     FCount: Int64;
     FSum: Double;
-    FValues: TArray<Int64>;
+    FBucketValues: TArray<Int64>;
+    procedure CollectChild(var ASamples: TArray<TSample>; const ALabelValues: TLabelValues);
   public
     /// <summary>
     ///  Creates a new instance of this histogram collector child.
@@ -57,87 +53,68 @@ type
     /// </summary>
     destructor Destroy; override;
     /// <summary>
-    ///  Collects all the samples of this histogram child.
+    ///  Array of the cummulative counts for values falling within the intervals specified by the parent histogram
     /// </summary>
-    procedure CollectChild(var ASamples: TArray<TSample>;
-      const ALabelValues: TLabelValues);
+    property Values: TArray<Int64> read FBucketValues;
     /// <summary>
-    ///  Adds a single observation to the histogram.
+    ///  Adds an observation to this labelled child
     /// </summary>
     /// <remarks>
-    ///  The buckets are cummulative and any value that is less than - or equal
-    ///  to - the upper bound will increment the bucket.
-    /// </remarks>
+    ///  Increments the parent values
+    /// <remarks>
     function Observe(AValue: Double): THistogram;
     /// <summary>
-    ///  Gets the total number of samples collected for this labelled child.
+    ///  Total number of samples collected for this labelled child
     /// </summary>
     property Count: Int64 read FCount;
     /// <summary>
-    ///  Gets the total cumulative value calculated for this labelled child.
+    ///  Total cummulative value collected for this labelled child.
     /// </summary>
     property Sum: Double read FSum;
-    /// <summary>
-    ///  The array of cumulative counts for values falling within
-    ///  the intervals specified by the parent (owner) histogram.
-    /// </summary>
-    property Values: TArray<Int64> read FValues;
   end;
 
 { TBucketGeneratorFunc }
+  TComplexBucketFunc = reference to function: TBuckets;
 
   /// <summary>
-  ///  A function that returns the buckets to be used in histogram metrics.
+  ///  Classic Histogram with individually labelled object to collect values based on a histogram
   /// </summary>
-  TBucketGeneratorFunc = reference to function: TBuckets;
-
-{ THistogram }
-
-  /// <summary>
-  ///  An histogram is a metric that counts observed values using a number
-  ///  of configurable buckets and expose those ones as individual counter
-  ///  time series.
-  /// </summary>
-  /// <remarks>
-  ///  Histograms are tipically used to allow a generic service to record the
-  ///  distribution of a stream of data values into a set of ranged buckets.
-  /// </remarks>
   THistogram = class(TSimpleCollector<THistogramChild>)
-  strict private
-    FBuckets: TBuckets;
-    FCount: Int64;
-    FSum: Double;
-    function GetValue: Double;
   private
-    procedure IncrementOwner(AValue: Double);
-  strict protected
+    FBuckets: TBuckets;
+    FSum: Double;
+    FCount: Int64;
+    function GetValue: Double;
+  protected
     function CreateChild: THistogramChild; override;
+    procedure IncrementOwner(AValue: Double);
   public
     /// <summary>
-    ///  Creates a new instance of a histogram collector.
+    ///  Creates a new instance of this histogram collector.
     /// </summary>
     constructor Create(const AName: string; const AHelp: string = '';
       const ABuckets: TBuckets = []; const ALabelNames: TLabelNames = []); reintroduce; overload;
+
     /// <summary>
-    ///  Creates a new instance of a histogram collector
+    ///  Creates a new instance of this histogram collector
     ///  with an increasing sequence in the bucket.
     /// </summary>
     constructor Create(const AName: string; const AHelp: string; const AStart, AFactor: Double; const ACount: Integer;
       const ALabelNames: TLabelNames); reintroduce; overload;
+
     /// <summary>
-    ///  Creates a new instance of a histogram collector
-    ///  with a custom sequence of buckets.
+    ///  Creates a new instance of this histogram collector with a customised sequence of buckets
     /// </summary>
-    /// <remarks>
+	/// <remarks>
     ///  Generate buckets by passing an appropriate function when calling this constructor.
     /// </remarks>
     constructor Create(const AName: string; const AHelp: string;
-      ABucketGeneratorFunc: TBucketGeneratorFunc;
+      GenerateBuckets: TComplexBucketFunc;
       const ALabelNames: TLabelNames); reintroduce; overload;
+
     /// <summary>
     ///  Adds an observation to the top level histogram (i.e. no labels applied).
     /// </summary>
-    /// <summary></summary>
     function Observe(AValue: Double): THistogram;
     /// <summary>
     ///  Collects all the metrics and the samples from this collector.
@@ -152,11 +129,11 @@ type
     /// </summary>
     property Buckets: TBuckets read FBuckets;
     /// <summary>
-    ///  Returns the current count of values belonging to this metric.
+    ///  Returns the current value of the total count metric.
     /// </summary>
     property Count: Int64 read FCount;
     /// <summary>
-    ///  Returns the current sum of values belonging to this metric.
+    ///  Returns the current value of the total sum metric.
     /// </summary>
     property Sum: Double read FSum;
     /// <summary>
@@ -167,27 +144,16 @@ type
 
 implementation
 
-uses
-  System.Generics.Collections,
-  System.StrUtils,
-  System.SysUtils,
-  Prometheus.Resources;
-
 const
   RESERVED_LABEL_NAME = 'le';
 
-{ THistogramChild }
-
+  { THistogramChild }
 constructor THistogramChild.Create(AOwner: THistogram);
 begin
   inherited Create;
-  if not Assigned(AOwner) then
-    raise EArgumentNilException.Create(StrErrHistogramOwnerNil);
-  if Length(AOwner.Buckets) <= 0 then
-    raise EArgumentException.Create(StrErrHistogramOwnerNoBuckets);
   FLock := TObject.Create;
   FOwner := AOwner;
-  SetLength(FValues, Length(AOwner.Buckets));
+  SetLength(FBucketValues, Length(AOwner.FBuckets));
 end;
 
 destructor THistogramChild.Destroy;
@@ -197,52 +163,15 @@ begin
   inherited Destroy;
 end;
 
-procedure THistogramChild.CollectChild(var ASamples: TArray<TSample>;
-  const ALabelValues: TLabelValues);
-begin
-  TMonitor.Enter(FLock);
-  try
-    var LStartIndex := Length(ASamples);
-    SetLength(ASamples, LStartIndex + Length(FOwner.Buckets));
-
-    var LLabelNames := FOwner.LabelNames;
-    SetLength(LLabelNames, Length(FOwner.LabelNames) + 1);
-    LLabelNames[Length(FOwner.LabelNames)] := RESERVED_LABEL_NAME;
-
-    var LLabelValues := ALabelValues;
-    SetLength(LLabelValues, Length(ALabelValues) + 1);
-
-    for var LBucketIndex := 0 to Length(FOwner.Buckets) - 1 do
-    begin
-      var LSample := PSample(@ASamples[LStartIndex + LBucketIndex]);
-      LSample^.MetricName := FOwner.Name + '_bucket';
-      LSample^.LabelNames := LLabelNames;
-      if FOwner.Buckets[LBucketIndex] < INFINITE then
-      begin
-        var LFormatSettings := TFormatSettings.Create;
-        LFormatSettings.DecimalSeparator := '.';
-        LFormatSettings.ThousandSeparator := ',';
-        LLabelValues[Length(ALabelValues)] := FloatToStr(FOwner.Buckets[LBucketIndex], LFormatSettings)
-      end
-      else
-        LLabelValues[Length(ALabelValues)] := '+Inf';
-      LSample^.LabelValues := LLabelValues;
-      SetLength(LSample^.LabelValues, Length(LLabelValues));
-      LSample^.Value := FValues[LBucketIndex];
-    end;
-  finally
-    TMonitor.Exit(FLock);
-  end;
-end;
-
 function THistogramChild.Observe(AValue: Double): THistogram;
+(* The buckets are cummulative and any value that is less than - or equal to - the upper bound will increment the bucket *)
 begin
   TMonitor.Enter(FLock);
   try
-    for var LIndex := Length(FValues) - 1 downto 0 do
+    for var I := Length(FBucketValues) - 1 downto 0 do
     begin
-      if AValue <= FOwner.Buckets[LIndex] then
-        Inc(FValues[LIndex])
+      if AValue <= FOwner.FBuckets[I] then
+        Inc(FBucketValues[I])
       else
         Break;
     end;
@@ -251,100 +180,111 @@ begin
   finally
     TMonitor.Exit(FLock);
   end;
+
   FOwner.IncrementOwner(AValue);
   Result := FOwner;
 end;
 
-{ THistogram }
+procedure THistogramChild.CollectChild(var ASamples: TArray<TSample>; const ALabelValues: TLabelValues);
+var
+  StartIdx: Integer;
+  lSample: PSample;
+  lLabelNames: TLabelNames;
+  lLabelValues: TLabelValues;
+begin
+  TMonitor.Enter(FLock);
+  try
+    StartIdx := Length(ASamples);
+    SetLength(ASamples, StartIdx + Length(FOwner.FBuckets));
 
-constructor THistogram.Create(const AName, AHelp: string;
-  const ABuckets: TBuckets; const ALabelNames: TLabelNames);
+    lLabelNames := FOwner.LabelNames;
+    (* force a copy and resize, otherwise local is just a pointer to original *)
+    SetLength(lLabelNames, Length(FOwner.LabelNames) + 1);
+    lLabelNames[Length(FOwner.LabelNames)] := RESERVED_LABEL_NAME;
+
+    (* force a copy and resize *)
+    lLabelValues := ALabelValues;
+    SetLength(lLabelValues, Length(ALabelValues) + 1);
+
+    for var I := 0 to Length(FOwner.FBuckets) - 1 do
+    begin
+      lSample := PSample(@ASamples[StartIdx + I]);
+      lSample^.MetricName := FOwner.Name + '_bucket';
+
+      lSample^.LabelNames := lLabelNames;
+      if FOwner.FBuckets[I] < INFINITE then
+      begin
+        var
+        lFormatSettings := TFormatSettings.Create;
+        lFormatSettings.DecimalSeparator := '.';
+        lFormatSettings.ThousandSeparator := ',';
+        lLabelValues[Length(ALabelValues)] := FloatToStr(FOwner.FBuckets[I], lFormatSettings)
+      end
+      else
+        lLabelValues[Length(ALabelValues)] := '+Inf';
+
+      lSample^.LabelValues := lLabelValues;
+      (* NB: this forces a copy rather than a ref *)
+      SetLength(lSample^.LabelValues, Length(lLabelValues));
+
+      lSample^.Value := FBucketValues[I];
+      lSample^.TimeStamp := DateTimeToUnix(TTimeZone.Local.ToUniversalTime(Now)) * SECS_TO_MILLISECS;
+    end;
+  finally
+    TMonitor.Exit(FLock);
+  end;
+end;
+
+{ THistogram }
+constructor THistogram.Create(const AName, AHelp: string; const ABuckets: TBuckets; const ALabelNames: TLabelNames);
+var
+  LastBucketIdx: Integer;
 begin
   if IndexText(RESERVED_LABEL_NAME, ALabelNames) > -1 then
     raise EInvalidOpException.CreateFmt('Label name ''%s'' is reserved', [RESERVED_LABEL_NAME]);
+
   if Length(ABuckets) > 0 then
     FBuckets := ABuckets
   else
     FBuckets := DEFAULT_BUCKETS;
   TArray.Sort<Double>(FBuckets);
-  var LBucketCount := Length(FBuckets);
-  if FBuckets[LBucketCount - 1] < INFINITE then
+  LastBucketIdx := Length(FBuckets);
+  if FBuckets[LastBucketIdx - 1] < INFINITE then
   begin
-    SetLength(FBuckets, LBucketCount + 1);
-    FBuckets[LBucketCount] := INFINITE;
+    SetLength(FBuckets, LastBucketIdx + 1);
+    FBuckets[LastBucketIdx] := INFINITE;
   end;
+
   inherited Create(AName, AHelp, ALabelNames);
 end;
 
-constructor THistogram.Create(const AName, AHelp: string;
-  ABucketGeneratorFunc: TBucketGeneratorFunc; const ALabelNames: TLabelNames);
+constructor THistogram.Create(const AName, AHelp: string; GenerateBuckets: TComplexBucketFunc; const ALabelNames: TLabelNames);
+var
+  lBuckets: TBuckets;
 begin
-  Create(AName, AHelp, ABucketGeneratorFunc, ALabelNames);
+  lBuckets := GenerateBuckets;
+  Create(AName, AHelp, lBuckets, ALabelNames);
 end;
 
-constructor THistogram.Create(const AName, AHelp: string;
-  const AStart, AFactor: Double; const ACount: Integer;
+constructor THistogram.Create(const AName, AHelp: string; const AStart, AFactor: Double; const ACount: Integer;
   const ALabelNames: TLabelNames);
+var
+  lBuckets: TBuckets;
+  lNextValue: Double;
 begin
-  Create(AName, AHelp,
-  function (): TBuckets
+  SetLength(lBuckets, ACount);
+  lNextValue := AStart;
+  for var I := 0 to ACount - 1 do
   begin
-    SetLength(Result, ACount);
-    var LCurrentValue := AStart;
-    for var LCurrentIndex := 0 to ACount - 1 do
-    begin
-      Result[LCurrentIndex] := LCurrentValue;
-      LCurrentValue := LCurrentValue * AFactor;
-    end;
-  end,
-  ALabelNames);
+    lBuckets[I] := lNextValue;
+    lNextValue := lNextValue * AFactor;
+  end;
+  Create(AName, AHelp, lBuckets, ALabelNames);
 end;
 
 function THistogram.CreateChild: THistogramChild;
 begin
   Result := THistogramChild.Create(Self);
-end;
-
-function THistogram.Collect: TArray<TMetricSamples>;
-begin
-  TMonitor.Enter(Lock);
-  try
-    SetLength(Result, 1);
-    var LMetric := PMetricSamples(@Result[0]);
-    LMetric^.MetricName := Self.Name;
-    LMetric^.MetricHelp := Self.Help;
-    LMetric^.MetricType := TMetricType.mtHistogram;
-    LMetric^.MetricSum := FSum;
-    LMetric^.MetricCount := FCount;
-    SetLength(LMetric.Samples, 0); // Clear link to previous samples.
-    EnumChildren(
-      procedure(const ALabelValues: TLabelValues; const AChild: THistogramChild)
-      begin
-        if Length(LabelNames) > 0 then
-        begin
-          // Add the top level sum for the child.
-          var LStartIndex := Length(LMetric.Samples);
-          SetLength(LMetric.Samples, LStartIndex + 1);
-          var LSample := PSample(@LMetric.Samples[LStartIndex]);
-          LSample^.MetricName := Name + '_sum';
-          LSample^.LabelNames := LabelNames;
-          LSample^.LabelValues := ALabelValues;
-          LSample^.Value := AChild.Sum;
-          // Add the top level count for the child.
-          LStartIndex := Length(LMetric.Samples);
-          SetLength(LMetric.Samples, LStartIndex + 1);
-          LSample := PSample(@LMetric.Samples[LStartIndex]);
-          LSample^.MetricName := Name + '_count';
-          LSample^.LabelNames := LabelNames;
-          LSample^.LabelValues := ALabelValues;
-          LSample^.Value := AChild.Count;
-        end;
-        AChild.CollectChild(LMetric^.Samples, ALabelValues);
-      end
-    );
-  finally
-    TMonitor.Exit(Lock);
-  end;
 end;
 
 function THistogram.GetNames: TArray<string>;
@@ -359,23 +299,75 @@ end;
 
 procedure THistogram.IncrementOwner(AValue: Double);
 begin
-  TMonitor.Enter(Lock);
+  TMonitor.Enter(FLock);
   try
     Inc(FCount);
     FSum := FSum + AValue;
   finally
-    TMonitor.Exit(Lock);
+    TMonitor.Exit(FLock);
   end;
 end;
 
 function THistogram.Observe(AValue: Double): THistogram;
 begin
   Result := Self;
-  TMonitor.Enter(Lock);
+  TMonitor.Enter(FLock);
   try
     GetNoLabelChild.Observe(AValue);
   finally
-    TMonitor.Exit(Lock);
+    TMonitor.Exit(FLock);
+  end;
+end;
+
+function THistogram.Collect: TArray<TMetricSamples>;
+begin
+  TMonitor.Enter(FLock);
+  try
+    SetLength(Result, 1);
+    var
+    LMetric := PMetricSamples(@Result[0]);
+    LMetric^.MetricName := Name;
+    LMetric^.MetricHelp := Help;
+    LMetric^.MetricType := TMetricType.mtHistogram;
+    LMetric^.MetricSum := FSum;
+    LMetric^.MetricCount := FCount;
+    LMetric^.TimeStamp := DateTimeToUnix(TTimeZone.Local.ToUniversalTime(Now)) * SECS_TO_MILLISECS;
+    (* clear link to previous Samples *)
+    SetLength(LMetric.Samples, 0);
+
+    EnumChildren(
+      procedure(const ALabelValues: TLabelValues; const AChild: THistogramChild)
+      var
+        StartIdx: Integer;
+        lSample: PSample;
+      begin
+        if Length(LabelNames) > 0 then
+        begin
+          (* add the top level sum for the child *)
+          StartIdx := Length(LMetric.Samples);
+          SetLength(LMetric.Samples, StartIdx + 1);
+
+          lSample := PSample(@LMetric.Samples[StartIdx]);
+          lSample^.MetricName := Name + '_sum';
+          lSample^.LabelNames := LabelNames;
+          lSample^.LabelValues := ALabelValues;
+          lSample^.TimeStamp := DateTimeToUnix(TTimeZone.Local.ToUniversalTime(Now)) * SECS_TO_MILLISECS;
+          lSample^.Value := AChild.Sum;
+          (* add the top level count for the child *)
+          StartIdx := Length(LMetric.Samples);
+          SetLength(LMetric.Samples, StartIdx + 1);
+
+          lSample := PSample(@LMetric.Samples[StartIdx]);
+          lSample^.MetricName := Name + '_count';
+          lSample^.LabelNames := LabelNames;
+          lSample^.LabelValues := ALabelValues;
+          lSample^.TimeStamp := DateTimeToUnix(TTimeZone.Local.ToUniversalTime(Now)) * SECS_TO_MILLISECS;
+          lSample^.Value := AChild.Count;
+        end;
+        AChild.CollectChild(LMetric^.Samples, ALabelValues);
+      end);
+  finally
+    TMonitor.Exit(FLock);
   end;
 end;
 
