@@ -7,6 +7,9 @@ uses
   Prometheus.Samples,
   Prometheus.SimpleCollector;
 
+const
+  SECS_TO_MILLISECS = 1000;
+
 type
 
 { TCounterChild }
@@ -51,10 +54,19 @@ type
   /// </remarks>
   TCounter = class (TSimpleCollector<TCounterChild>)
   strict private
+    FLock: TObject;
     function GetValue: Double;
   strict protected
     function CreateChild: TCounterChild; override;
   public
+    /// <summary>
+    ///  Creates a new instance of this counter collector.
+    /// </summary>
+    constructor Create(const AName: string; const AHelp: string = ''; const ALabelNames: TLabelNames = []); override;
+    /// <summary>
+    ///  Performs object cleanup releasing all the owned instances.
+    /// </summary>
+    destructor Destroy; override;
     /// <summary>
     ///  Collects all the metrics and the samples from this collector.
     /// </summary>
@@ -76,6 +88,7 @@ type
 implementation
 
 uses
+  System.DateUtils,
   System.SysUtils,
   Prometheus.Resources;
 
@@ -108,9 +121,22 @@ end;
 
 { TCounter }
 
+constructor TCounter.Create(const AName: string; const AHelp: string = ''; const ALabelNames: TLabelNames = []);
+begin
+  inherited Create(AName, AHelp, ALabelNames);
+  FLock := TObject.Create;
+end;
+
+destructor TCounter.Destroy;
+begin
+  if Assigned(FLock) then
+    FreeAndNil(FLock);
+  inherited Destroy;
+end;
+
 function TCounter.Collect: TArray<TMetricSamples>;
 begin
-  TMonitor.Enter(Lock);
+  TMonitor.Enter(FLock);
   try
     SetLength(Result, 1);
     var LMetric := PMetricSamples(@Result[0]);
@@ -126,12 +152,13 @@ begin
         LSample^.MetricName := Self.Name;
         LSample^.LabelNames := Self.LabelNames;
         LSample^.LabelValues := ALabelValues;
+        LSample^.TimeStamp := DateTimeToUnix(TTimeZone.Local.ToUniversalTime(Now)) * SECS_TO_MILLISECS;
         LSample^.Value := AChild.Value;
         System.Inc(LIndex);
       end
     );
   finally
-    TMonitor.Exit(Lock);
+    TMonitor.Exit(FLock);
   end;
 end;
 

@@ -8,11 +8,9 @@ uses
 
 type
 
-{ Enums }
+{ TSample }
 
   TMetricType = (mtCounter, mtGauge, mtHistogram);
-
-{ TSample }
 
   /// <summary>
   ///  Represents a typical sample that can belong to any metrics and can
@@ -33,6 +31,10 @@ type
     /// </summary>
     LabelValues: TArray<string>;
     /// <summary>
+    ///  The timestamp of this sample.
+    /// </summary>
+    TimeStamp: Int64;
+    /// <summary>
     ///  The current value of this sample.
     /// </summary>
     Value: Double;
@@ -40,6 +42,10 @@ type
     ///  Check if this sample is bound to label names and values.
     /// </summary>
     function HasLabels: Boolean;
+    /// <summary>
+    ///  Check if this sample has a valid timestamp.
+    /// </summary>
+    function HasTimeStamp: Boolean;
   end;
 
 { PSample }
@@ -79,6 +85,14 @@ type
     ///  The count of all observed processes, used for histogram
     /// </summary>
     MetricCount: Int64;
+    /// <summary>
+    ///  Check if this sample has a valid timestamp.
+    /// </summary>
+    TimeStamp: Int64;
+    /// <summary>
+    ///  The current value of this sample.
+    /// </summary>
+    function HasTimeStamp: Boolean;
   end;
 
 { PMetricSamples }
@@ -101,5 +115,18 @@ function TSample.HasLabels: Boolean;
 begin
   Result := (Length(LabelNames) > 0) and (Length(LabelValues) > 0);
 end;
+
+function TSample.HasTimeStamp: Boolean;
+begin
+  Result := TimeStamp > 0;
+end;
+
+{ TMetricSample }
+
+function TMetricSamples.HasTimeStamp: Boolean;
+begin
+  Result := TimeStamp > 0;
+end;
+
 
 end.
