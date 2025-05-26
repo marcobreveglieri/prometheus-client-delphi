@@ -72,13 +72,17 @@ type
     /// </summary>
     Samples: TArray<TSample>;
     /// <summary>
-    ///  The sum off all metrics values, used for histogram
+    ///  The sum off all metrics values (used for histograms).
     /// </summary>
     MetricSum: Double;
     /// <summary>
-    ///  The count of all observed processes, used for histogram
+    ///  The count of all observed processes (used for histograms).
     /// </summary>
     MetricCount: Int64;
+    /// <summary>
+    ///  Indicates whether the current metric has no samples in it.
+    /// </summary>
+    function IsEmpty: Boolean;
   end;
 
 { PMetricSamples }
@@ -100,6 +104,13 @@ implementation
 function TSample.HasLabels: Boolean;
 begin
   Result := (Length(LabelNames) > 0) and (Length(LabelValues) > 0);
+end;
+
+{ TMetricSamples }
+
+function TMetricSamples.IsEmpty: Boolean;
+begin
+  Result := Length(Samples) <= 0;
 end;
 
 end.
