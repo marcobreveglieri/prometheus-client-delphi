@@ -17,9 +17,7 @@ type
   TTextExposer = class
   strict private
     function EscapeToken(const AText: string): string;
-    function FormatInfiniteOrNaN(const AValue: Double): string;
     function FormatNumber(const AValue: Double): string;
-    function FormatDecimal(const AValue: Double): string;
   public
     /// <summary>
     ///  Renders the specified samples as a string.
@@ -77,7 +75,13 @@ begin
     .Replace('"', '\"');
 end;
 
-function TTextExposer.FormatInfiniteOrNaN(const AValue: Double): string;
+function TTextExposer.FormatNumber(const AValue: Double): string;
+const
+  // This pattern avoids the use of exponential notation
+  // since it leads to errors when parsed from Prometheus
+  // using the strconv.ParseFloat() function call in Go
+  // (see: https://pkg.go.dev/strconv#ParseFloat).
+  SFormatPattern = '0.######################';
 begin
   if AValue.IsNegativeInfinity then
   begin
@@ -94,25 +98,10 @@ begin
     Result := 'Nan';
     Exit;
   end;
-  Result := '';
-end;
-
-function TTextExposer.FormatNumber(const AValue: Double): string;
-begin
-  Result := FormatInfiniteOrNaN(AValue);
-  if Result = '' then
-    Result := AValue.ToString;
-end;
-
-function TTextExposer.FormatDecimal(const AValue: Double): string;
-begin
-  Result := FormatInfiniteOrNaN(AValue);
-  if Result <> '' then
-    Exit;
   var LFormatSettings := TFormatSettings.Create;
   LFormatSettings.DecimalSeparator := '.';
   LFormatSettings.ThousandSeparator := ',';
-  Result := FloatToStr(AValue, LFormatSettings);
+  Result := FormatFloat(SFormatPattern, AValue, LFormatSettings);
 end;
 
 function TTextExposer.Render(ASamples: TArray<TMetricSamples>): string;
@@ -153,9 +142,11 @@ end;
 
 procedure TTextExposer.Render(AWriter: TTextWriter; ASamples: TArray<TMetricSamples>);
 begin
-  // TODO: Check output if LMetricSet.Samples == 0 -NdMarco
   for var LMetricSet in ASamples do
   begin
+    if LMetricSet.IsEmpty then
+      Continue;
+
     // Metric help
     AWriter.Write('# HELP');
     AWriter.Write(' ');
@@ -206,7 +197,7 @@ begin
       begin
         AWriter.Write(Format('%s_sum %s', [
           LMetricSet.MetricName,
-          FormatDecimal(LMetricSet.MetricSum)
+          FormatNumber(LMetricSet.MetricSum)
         ]));
         AWriter.Write(#10);
       end;
@@ -214,7 +205,7 @@ begin
       begin
         AWriter.Write(Format('%s_count %s', [
           LMetricSet.MetricName,
-          FormatDecimal(LMetricSet.MetricCount)
+          IntToStr(LMetricSet.MetricCount)
         ]));
         AWriter.Write(#10);
       end;
