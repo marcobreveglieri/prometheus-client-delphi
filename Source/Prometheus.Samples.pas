@@ -3,6 +3,7 @@ unit Prometheus.Samples;
 interface
 
 uses
+  System.SysUtils,
   Prometheus.Labels,
   Prometheus.Metrics;
 
@@ -96,6 +97,8 @@ const
   StrMetricType: array[TMetricType] of string = (
     'counter', 'gauge', 'histogram'
   );
+var
+  FSPrometheus: TFormatSettings;
 
 implementation
 
@@ -112,5 +115,12 @@ function TMetricSamples.IsEmpty: Boolean;
 begin
   Result := Length(Samples) <= 0;
 end;
+
+initialization
+
+FSPrometheus := TFormatSettings.Create;
+FSPrometheus.ThousandSeparator := ',';
+FSPrometheus.DecimalSeparator := '.';
+
 
 end.

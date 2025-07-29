@@ -219,10 +219,7 @@ begin
       LSample^.LabelNames := LLabelNames;
       if FOwner.Buckets[LBucketIndex] < INFINITE then
       begin
-        var LFormatSettings := TFormatSettings.Create;
-        LFormatSettings.DecimalSeparator := '.';
-        LFormatSettings.ThousandSeparator := ',';
-        LLabelValues[Length(ALabelValues)] := FloatToStr(FOwner.Buckets[LBucketIndex], LFormatSettings)
+        LLabelValues[Length(ALabelValues)] := FloatToStr(FOwner.Buckets[LBucketIndex], FSPrometheus)
       end
       else
         LLabelValues[Length(ALabelValues)] := '+Inf';

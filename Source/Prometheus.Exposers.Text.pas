@@ -98,10 +98,7 @@ begin
     Result := 'Nan';
     Exit;
   end;
-  var LFormatSettings := TFormatSettings.Create;
-  LFormatSettings.DecimalSeparator := '.';
-  LFormatSettings.ThousandSeparator := ',';
-  Result := FormatFloat(SFormatPattern, AValue, LFormatSettings);
+  Result := FormatFloat(SFormatPattern, AValue, FSPrometheus);
 end;
 
 function TTextExposer.Render(ASamples: TArray<TMetricSamples>): string;
