@@ -62,7 +62,7 @@ begin
     LHistogram.Observe(1);
 
     var LMetricArray := LHistogram.Collect;
-    Assert.AreEqual(1, Length( LMetricArray));
+    Assert.AreEqual(1, Length(LMetricArray));
 
     for var LMetric in LMetricArray do
     begin

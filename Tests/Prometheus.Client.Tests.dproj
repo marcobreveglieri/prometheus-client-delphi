@@ -164,6 +164,7 @@
         <DCCReference Include="Fixtures\Prometheus.Tests.Fixtures.Collectors.Counter.pas"/>
         <DCCReference Include="Fixtures\Prometheus.Tests.Fixtures.Collectors.Gauge.pas"/>
         <DCCReference Include="Fixtures\Prometheus.Tests.Fixtures.Collectors.Histogram.pas"/>
+        <DCCReference Include="Fixtures\Prometheus.Tests.Fixtures.Exposers.Text.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -206,6 +207,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Win32\Debug\Prometheus.Client.Tests.exe" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="Win32\Debug\Prometheus.Client.Tests.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>Prometheus.Client.Tests.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">
                         <Operation>1</Operation>
