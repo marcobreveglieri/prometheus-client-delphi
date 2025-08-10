@@ -149,10 +149,13 @@ begin
     AWriter.Write('# HELP');
     AWriter.Write(' ');
     AWriter.Write(LMetricSet.MetricName);
-    AWriter.Write(' ');
-    AWriter.Write(EscapeToken(LMetricSet.MetricHelp));
-    if not LMetricSet.MetricHelp.EndsWith('.') then
-      AWriter.Write('.');
+    if Length(LMetricSet.MetricHelp) > 0 then
+    begin
+      AWriter.Write(' ');
+      AWriter.Write(EscapeToken(LMetricSet.MetricHelp));
+      if not LMetricSet.MetricHelp.EndsWith('.') then
+        AWriter.Write('.');
+    end;
     AWriter.Write(#10);
 
     // Metric type
