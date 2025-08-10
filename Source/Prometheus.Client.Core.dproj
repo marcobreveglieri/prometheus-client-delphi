@@ -138,6 +138,7 @@
         <DCCReference Include="Prometheus.Samples.pas"/>
         <DCCReference Include="Prometheus.SimpleCollector.pas"/>
         <DCCReference Include="Prometheus.Collectors.Histogram.pas"/>
+        <DCCReference Include="Prometheus.Formatting.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -178,6 +179,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\Prometheus.Client.Core.bpl" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\23.0\Bpl\Prometheus.Client.Core.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>Prometheus.Client.Core.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="OSX32">
                         <Operation>1</Operation>

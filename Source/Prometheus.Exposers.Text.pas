@@ -40,7 +40,8 @@ type
 implementation
 
 uses
-  System.Math;
+  System.Math,
+  Prometheus.Formatting;
 
 type
 
@@ -98,10 +99,7 @@ begin
     Result := 'Nan';
     Exit;
   end;
-  var LFormatSettings := TFormatSettings.Create;
-  LFormatSettings.DecimalSeparator := '.';
-  LFormatSettings.ThousandSeparator := ',';
-  Result := FormatFloat(SFormatPattern, AValue, LFormatSettings);
+  Result := FormatFloat(SFormatPattern, AValue, PromFormatSettings);
 end;
 
 function TTextExposer.Render(ASamples: TArray<TMetricSamples>): string;

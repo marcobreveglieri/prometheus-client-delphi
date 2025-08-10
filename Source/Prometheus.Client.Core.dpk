@@ -41,6 +41,7 @@ contains
   Prometheus.Resources in 'Prometheus.Resources.pas',
   Prometheus.Samples in 'Prometheus.Samples.pas',
   Prometheus.SimpleCollector in 'Prometheus.SimpleCollector.pas',
-  Prometheus.Collectors.Histogram in 'Prometheus.Collectors.Histogram.pas';
+  Prometheus.Collectors.Histogram in 'Prometheus.Collectors.Histogram.pas',
+  Prometheus.Formatting in 'Prometheus.Formatting.pas';
 
 end.
