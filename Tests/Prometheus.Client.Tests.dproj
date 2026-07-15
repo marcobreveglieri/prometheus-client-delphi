@@ -165,6 +165,7 @@
         <DCCReference Include="Fixtures\Prometheus.Tests.Fixtures.Collectors.Gauge.pas"/>
         <DCCReference Include="Fixtures\Prometheus.Tests.Fixtures.Collectors.Histogram.pas"/>
         <DCCReference Include="Fixtures\Prometheus.Tests.Fixtures.Exposers.Text.pas"/>
+        <DCCReference Include="Fixtures\Prometheus.Tests.Fixtures.Quantiles.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

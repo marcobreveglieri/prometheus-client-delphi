@@ -19,6 +19,7 @@ resourcestring
   StrErrCollectorHasLabels = 'This collectors has labels: use label values to retrieve children collectors';
   StrErrHistogramOwnerNil = 'Histogram owner is not assigned';
   StrErrHistogramOwnerNoBuckets = 'Histogram owner has no buckets';
+  StrErrQuantileObjectivesEmpty = 'At least one quantile objective must be specified';
 
 implementation
 
