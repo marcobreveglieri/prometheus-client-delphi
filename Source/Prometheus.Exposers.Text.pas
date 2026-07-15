@@ -192,7 +192,7 @@ begin
       AWriter.Write(#10);
     end;
 
-    if LMetricSet.MetricType = TMetricType.mtHistogram then
+    if LMetricSet.MetricType in [TMetricType.mtHistogram, TMetricType.mtSummary] then
     begin
       AWriter.Write(Format('%s_sum %s', [
         LMetricSet.MetricName,

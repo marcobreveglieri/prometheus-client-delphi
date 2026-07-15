@@ -140,6 +140,7 @@
         <DCCReference Include="Prometheus.Collectors.Histogram.pas"/>
         <DCCReference Include="Prometheus.Formatting.pas"/>
         <DCCReference Include="Prometheus.Quantiles.pas"/>
+        <DCCReference Include="Prometheus.Collectors.Summary.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
