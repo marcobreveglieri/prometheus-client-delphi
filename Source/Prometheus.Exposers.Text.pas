@@ -96,7 +96,7 @@ begin
   end;
   if AValue.IsNan then
   begin
-    Result := 'Nan';
+    Result := 'NaN';
     Exit;
   end;
   Result := FormatFloat(SFormatPattern, AValue, PromFormatSettings);
@@ -194,22 +194,16 @@ begin
 
     if LMetricSet.MetricType = TMetricType.mtHistogram then
     begin
-      if LMetricSet.MetricSum > 0.0 then
-      begin
-        AWriter.Write(Format('%s_sum %s', [
-          LMetricSet.MetricName,
-          FormatNumber(LMetricSet.MetricSum)
-        ]));
-        AWriter.Write(#10);
-      end;
-      if LMetricSet.MetricCount > 0.0 then
-      begin
-        AWriter.Write(Format('%s_count %s', [
-          LMetricSet.MetricName,
-          IntToStr(LMetricSet.MetricCount)
-        ]));
-        AWriter.Write(#10);
-      end;
+      AWriter.Write(Format('%s_sum %s', [
+        LMetricSet.MetricName,
+        FormatNumber(LMetricSet.MetricSum)
+      ]));
+      AWriter.Write(#10);
+      AWriter.Write(Format('%s_count %s', [
+        LMetricSet.MetricName,
+        IntToStr(LMetricSet.MetricCount)
+      ]));
+      AWriter.Write(#10);
     end;
   end;
 end;
