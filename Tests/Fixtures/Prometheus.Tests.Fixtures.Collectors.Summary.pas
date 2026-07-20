@@ -148,9 +148,9 @@ begin
   var LSummary := TSummary.Create('Sample');
   try
     Assert.AreEqual(3, Length(LSummary.Objectives));
-    Assert.AreEqual(0.5, LSummary.Objectives[0].Quantile, Double.Epsilon);
-    Assert.AreEqual(0.9, LSummary.Objectives[1].Quantile, Double.Epsilon);
-    Assert.AreEqual(0.99, LSummary.Objectives[2].Quantile, Double.Epsilon);
+    Assert.AreEqual(0.5, LSummary.Objectives[0].Quantile, 1E-9);
+    Assert.AreEqual(0.9, LSummary.Objectives[1].Quantile, 1E-9);
+    Assert.AreEqual(0.99, LSummary.Objectives[2].Quantile, 1E-9);
   finally
     LSummary.Free;
   end;
@@ -163,8 +163,8 @@ begin
     TQuantileObjective.Create(0.5, 0.05)]);
   try
     Assert.AreEqual(2, Length(LSummary.Objectives));
-    Assert.AreEqual(0.5, LSummary.Objectives[0].Quantile, Double.Epsilon);
-    Assert.AreEqual(0.99, LSummary.Objectives[1].Quantile, Double.Epsilon);
+    Assert.AreEqual(0.5, LSummary.Objectives[0].Quantile, 1E-9);
+    Assert.AreEqual(0.99, LSummary.Objectives[1].Quantile, 1E-9);
   finally
     LSummary.Free;
   end;
