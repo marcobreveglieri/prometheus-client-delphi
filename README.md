@@ -7,11 +7,36 @@
   <strong>Instrument your Delphi applications with Prometheus metrics for modern observability</strong>
 </p>
 
-## What is Prometheus?
+<p align="center">
+  <img alt="Delphi" src="https://img.shields.io/badge/Delphi-11%2B-red?logo=delphi&logoColor=white">
+  <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg">
+  <img alt="Boss" src="https://img.shields.io/badge/Boss-available-blue">
+</p>
+
+## 📑 Table of Contents
+
+- [❓ What is Prometheus?](#-what-is-prometheus)
+- [🚀 Prometheus Delphi Client](#-prometheus-delphi-client)
+- [🧩 Features](#-features)
+- [📦 Installation](#-installation)
+- [⚡ Quick Start Guide](#-quick-start-guide)
+- [📏 Metric Types](#-metric-types)
+- [🏷️ Working with Labels](#-working-with-labels)
+- [📤 Exporting Metrics](#-exporting-metrics)
+- [🌐 Web Framework Integration](#-web-framework-integration)
+- [💡 Real-World Examples](#-real-world-examples)
+- [📚 Documentation](#-documentation)
+- [🖥️ Delphi Compatibility](#-delphi-compatibility)
+- [✅ Problem? Solved!](#-problem-solved)
+- [🤝 Contributing](#-contributing)
+- [🔗 Resources](#-resources)
+- [📄 License](#-license)
+
+## ❓ What is Prometheus?
 
 [Prometheus](http://prometheus.io) is an open-source monitoring and alerting toolkit that has become the de-facto standard for cloud-native monitoring. Originally built at SoundCloud, it's now a graduated [CNCF](https://www.cncf.io/) project used by organizations worldwide.
 
-### How Prometheus works
+### 🔄 How Prometheus works
 
 ```
 ┌─────────────┐          ┌─────────────┐          ┌─────────────┐
@@ -29,7 +54,7 @@
 5. Visualize data in **Grafana** dashboards
 6. Set up **alerts** when metrics exceed thresholds
 
-### Key Prometheus features
+### ✨ Key Prometheus features
 
 - **Multi-dimensional data model** - Metrics identified by name and labels (key-value pairs)
 - **Powerful query language (PromQL)** - Flexible queries and aggregations
@@ -38,7 +63,7 @@
 - **Built-in alerting** - Alert manager for handling alerts
 - **Efficient storage** - Local time-series database with optional remote storage
 
-### Monitoring matters!
+### 👀 Monitoring matters!
 
 Modern applications need **observability** to understand their behavior in production. Without proper monitoring, you're flying blind:
 
@@ -49,11 +74,11 @@ Modern applications need **observability** to understand their behavior in produ
 
 **Observability** is the practice of understanding your application's internal state by examining its outputs. Prometheus metrics are a core pillar of observability, alongside logs and traces.
 
-## Prometheus Delphi Client
+## 🚀 Prometheus Delphi Client
 
 The **Prometheus Delphi Client** library provides everything you need to instrument your Delphi applications with Prometheus metrics.
 
-## Features
+## 🧩 Features
 
 The Prometheus Delphi Client library offers a comprehensive set of features:
 
@@ -77,9 +102,9 @@ The Prometheus Delphi Client library offers a comprehensive set of features:
 
 - **Best Practices Built-in** - Follows [Prometheus best practices](https://prometheus.io/docs/practices/) for naming and usage
 
-## Installation
+## 📦 Installation
 
-### Using Boss Package Manager
+### 📥 Using Boss Package Manager
 
 [Boss](https://github.com/HashLoad/boss) is a dependency manager for Delphi. If you have Boss installed:
 
@@ -87,7 +112,7 @@ The Prometheus Delphi Client library offers a comprehensive set of features:
 boss install marcobreveglieri/prometheus-client-delphi
 ```
 
-### Manual Installation
+### 🛠️ Manual Installation
 
 1. Download or clone the repository from [GitHub](https://github.com/marcobreveglieri/prometheus-client-delphi)
 2. Add the `Source` folder to your project's search path:
@@ -100,11 +125,11 @@ Example:
 C:\Projects\prometheus-client-delphi\Source
 ```
 
-## Quick Start Guide
+## ⚡ Quick Start Guide
 
 Let's create a complete working example that tracks HTTP requests.
 
-### Step 1: Add Required Units
+### 1️⃣ Step 1: Add Required Units
 
 ```delphi
 uses
@@ -114,7 +139,7 @@ uses
   Prometheus.Exposers.Text;
 ```
 
-### Step 2: Create and Register Metrics
+### 2️⃣ Step 2: Create and Register Metrics
 
 ```delphi
 var
@@ -139,7 +164,7 @@ begin
 end;
 ```
 
-### Step 3: Track Metrics in Your Application
+### 3️⃣ Step 3: Track Metrics in Your Application
 
 ```delphi
 procedure HandleRequest(const AMethod, APath: string; AStatusCode: Integer);
@@ -160,7 +185,7 @@ begin
 end;
 ```
 
-### Step 4: Expose Metrics Endpoint
+### 4️⃣ Step 4: Expose Metrics Endpoint
 
 ```delphi
 // Example using Indy HTTP Server
@@ -185,7 +210,7 @@ begin
 end;
 ```
 
-### Step 5: Configure Prometheus
+### 5️⃣ Step 5: Configure Prometheus
 
 Create `prometheus.yml` to scrape your application:
 
@@ -204,9 +229,9 @@ Start Prometheus and visit `http://localhost:9090` to query your metrics!
 
 **Next Steps**: Check the [Getting Started](https://github.com/marcobreveglieri/prometheus-client-delphi/wiki/Getting-Started) wiki page for more detailed tutorials.
 
-## Metric Types
+## 📏 Metric Types
 
-### Counter
+### ➕ Counter
 
 A **counter** is a cumulative metric that only increases (or resets to zero on restart). Use counters for values that accumulate over time.
 
@@ -244,7 +269,7 @@ begin
 end;
 ```
 
-### Gauge
+### 🌡️ Gauge
 
 A **gauge** is a metric that can arbitrarily increase or decrease. Use gauges for values that represent current state.
 
@@ -279,7 +304,7 @@ begin
 end;
 ```
 
-### Histogram
+### 📊 Histogram
 
 A **histogram** samples observations and counts them in configurable buckets. Histograms are ideal for measuring distributions like request durations or response sizes.
 
@@ -322,7 +347,7 @@ begin
 end;
 ```
 
-### Summary
+### Σ Summary
 
 A **summary** samples observations and calculates configurable φ-quantiles (e.g. p50/p90/p99) over a sliding time window (default: 10 minutes, split into 5 age buckets), together with a cumulative sum and count of all observed values. Quantiles are estimated on the client side with the CKMS streaming algorithm, so each objective specifies both the quantile rank and its allowed estimation error.
 
@@ -381,7 +406,7 @@ Keep in mind that quantile values are reported as `NaN` when no observation fall
 
 **Learn more**: See [Metric Types](https://github.com/marcobreveglieri/prometheus-client-delphi/wiki/Metric-Types) in the wiki for detailed information, including when to use each type.
 
-## Working with Labels
+## 🏷️ Working with Labels
 
 **Labels** add dimensions to your metrics, allowing you to slice and dice data in Prometheus queries.
 
@@ -429,11 +454,11 @@ end;
 
 **Learn more**: See [Working with Labels](https://github.com/marcobreveglieri/prometheus-client-delphi/wiki/Working-with-Labels) for advanced patterns and best practices.
 
-## Exporting Metrics
+## 📤 Exporting Metrics
 
 Metrics must be exposed via an HTTP endpoint for Prometheus to scrape them.
 
-### Basic Export to String
+### 📝 Basic Export to String
 
 ```delphi
 uses
@@ -468,7 +493,7 @@ http_requests_total{method="POST",status="201"} 42
 memory_usage_bytes 1048576
 ```
 
-### Delphi MVC Framework
+### 🧱 Delphi MVC Framework
 
 The [DMVC Prometheus Metrics](https://github.com/marcobreveglieri/dmvc-prometheus-metrics) middleware integrates with DelphiMVCFramework applications.
 
@@ -481,7 +506,7 @@ The middleware automatically exposes metrics and can track requests, response ti
 
 **Learn more**: See [Web Framework Integration](https://github.com/marcobreveglieri/prometheus-client-delphi/wiki/Web-Framework-Integration) for framework-specific guides.
 
-### HTTP Endpoint with Indy
+### 🔌 HTTP Endpoint with Indy
 
 ```delphi
 uses
@@ -511,11 +536,11 @@ end;
 
 **Learn more**: See [Exporting Metrics](https://github.com/marcobreveglieri/prometheus-client-delphi/wiki/Exporting-Metrics) for more export methods, including streams, Windows services, and security best practices.
 
-## Web Framework Integration
+## 🌐 Web Framework Integration
 
 For popular Delphi web frameworks, use these official middleware packages that automatically expose metrics:
 
-### Horse Framework
+### 🐎 Horse Framework
 
 The [Horse Prometheus Metrics](https://github.com/marcobreveglieri/horse-prometheus-metrics) middleware provides automatic metrics exposition and optional request tracking.
 
@@ -541,9 +566,9 @@ begin
 end;
 ```
 
-## Real-World Examples
+## 💡 Real-World Examples
 
-### Complete HTTP Request Tracking
+### 🔍 Complete HTTP Request Tracking
 
 ```delphi
 uses
@@ -611,7 +636,7 @@ begin
 end;
 ```
 
-### Memory and Connection Pool Monitoring
+### 🧠 Memory and Connection Pool Monitoring
 
 ```delphi
 uses
@@ -660,11 +685,11 @@ end;
 
 **More examples**: See [Code Examples](https://github.com/marcobreveglieri/prometheus-client-delphi/wiki/Code-Examples) in the wiki for database monitoring, cache tracking, job queues, and more.
 
-## Documentation
+## 📚 Documentation
 
 Comprehensive documentation is available in the [GitHub Wiki](https://github.com/marcobreveglieri/prometheus-client-delphi/wiki).
 
-## Delphi Compatibility
+## 🖥️ Delphi Compatibility
 
 **Prometheus Client for Delphi** requires **Delphi 11 Alexandria** or later versions.
 
@@ -677,7 +702,7 @@ The library leverages modern Delphi language features including:
 
 While it may work with earlier Delphi versions with modifications, official support and testing target Delphi 11 Alexandria and newer releases. Development and testing are currently carried out on **Delphi 13.1**.
 
-## Problem? Solved!
+## ✅ Problem? Solved!
 
 | Problem | Solution |
 |---------|----------|
@@ -688,7 +713,7 @@ While it may work with earlier Delphi versions with modifications, official supp
 | **"How do I integrate with my web framework?"** | Official middlewares for Horse and DMVC Framework |
 | **"Can I create custom metrics?"** | Extensible architecture for custom collectors |
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Here's how you can help:
 
@@ -700,32 +725,32 @@ Contributions are welcome! Here's how you can help:
 
 See the [Contributing Guide](https://github.com/marcobreveglieri/prometheus-client-delphi/wiki/Contributing) for more details.
 
-## Resources
+## 🔗 Resources
 
-### Official Links
+### 🌍 Official Links
 - [GitHub Repository](https://github.com/marcobreveglieri/prometheus-client-delphi)
 - [Wiki Documentation](https://github.com/marcobreveglieri/prometheus-client-delphi/wiki)
 - [Issue Tracker](https://github.com/marcobreveglieri/prometheus-client-delphi/issues)
 
-### Prometheus Resources
+### 📊 Prometheus Resources
 - [Prometheus Official Site](https://prometheus.io)
 - [Prometheus Documentation](https://prometheus.io/docs/)
 - [Prometheus Best Practices](https://prometheus.io/docs/practices/)
 - [PromQL Query Language](https://prometheus.io/docs/prometheus/latest/querying/basics/)
 
-### Grafana Resources
+### 📈 Grafana Resources
 - [Grafana Official Site](https://grafana.com)
 - [Grafana Documentation](https://grafana.com/docs/)
 - [Prometheus Data Source Guide](https://grafana.com/docs/grafana/latest/datasources/prometheus/)
 
-### Middleware Packages
+### 🧰 Middleware Packages
 - [Horse Prometheus Metrics](https://github.com/marcobreveglieri/horse-prometheus-metrics) - Horse framework middleware
 - [DMVC Prometheus Metrics](https://github.com/marcobreveglieri/dmvc-prometheus-metrics) - Delphi MVC Framework middleware
 
-### Video Tutorials
+### 🎥 Video Tutorials
 - [Using Delphi with Prometheus and Grafana](https://www.youtube.com/watch?v=-bPDl6MP6jo) (Italian)
 
-## License
+## 📄 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
