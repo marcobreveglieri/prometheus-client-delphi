@@ -273,7 +273,7 @@ begin
   LGauge.SetDuration(
     procedure
     begin
-      // Your code here - gauge will be set to execution time in seconds
+      // Your code here - gauge will be set to execution time in milliseconds
       ProcessData();
     end);
 end;
@@ -675,13 +675,13 @@ The library leverages modern Delphi language features including:
 - Generics
 - Advanced RTTI
 
-While it may work with earlier Delphi versions with modifications, official support and testing target Delphi 11 Alexandria and newer releases.
+While it may work with earlier Delphi versions with modifications, official support and testing target Delphi 11 Alexandria and newer releases. Development and testing are currently carried out on **Delphi 13.1**.
 
 ## Problem? Solved!
 
 | Problem | Solution |
 |---------|----------|
-| **"How do I add metrics to my Delphi app?"** | Ready-to-use metric types: Counter, Gauge, Histogram |
+| **"How do I add metrics to my Delphi app?"** | Ready-to-use metric types: Counter, Gauge, Histogram, Summary |
 | **"How do I export metrics in Prometheus format?"** | Built-in text format exporter compatible with Prometheus |
 | **"How do I add context to my metrics?"** | Label support for multi-dimensional metrics |
 | **"Is it thread-safe?"** | Yes, all operations are thread-safe for multi-threaded apps |

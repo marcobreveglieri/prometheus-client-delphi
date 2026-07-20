@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+title: Prometheus Client for Delphi
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Marco
+    family-names: Breveglieri
+    email: brevve@gmail.com
+repository-code: 'https://github.com/marcobreveglieri/prometheus-client-delphi'
+url: 'https://github.com/marcobreveglieri/prometheus-client-delphi/wiki'
+abstract: >-
+  Prometheus Client for Delphi is an open-source client
+  library for instrumenting Delphi applications with
+  Prometheus metrics. It provides ready-to-use metric
+  types — Counter, Gauge, Histogram, and Summary — with
+  label support, a collector registry, and a Prometheus
+  text-format exporter, helping developers expose
+  application metrics for scraping by Prometheus and
+  visualization in Grafana.
+keywords:
+  - delphi
+  - prometheus
+  - metrics
+  - monitoring
+  - observability
+  - grafana
+license: MIT
