@@ -19,6 +19,13 @@ resourcestring
   StrErrCollectorHasLabels = 'This collectors has labels: use label values to retrieve children collectors';
   StrErrHistogramOwnerNil = 'Histogram owner is not assigned';
   StrErrHistogramOwnerNoBuckets = 'Histogram owner has no buckets';
+  StrErrQuantileObjectivesEmpty = 'At least one quantile objective must be specified';
+  StrErrSummaryOwnerNil = 'Summary owner is not assigned';
+  StrErrSummaryInvalidQuantile = 'Summary quantile objectives must be between 0 and 1';
+  StrErrSummaryInvalidError = 'Summary quantile objective error must be greater than or equal to 0 and less than 1';
+  StrErrSummaryDuplicateQuantile = 'Summary quantile objectives must be unique';
+  StrErrSummaryInvalidMaxAge = 'Summary max age must be greater than zero';
+  StrErrSummaryInvalidAgeBuckets = 'Summary age buckets count must be greater than zero';
 
 implementation
 

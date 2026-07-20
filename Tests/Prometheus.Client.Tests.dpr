@@ -19,7 +19,9 @@ uses
   Prometheus.Tests.Fixtures.Collectors.Counter in 'Fixtures\Prometheus.Tests.Fixtures.Collectors.Counter.pas',
   Prometheus.Tests.Fixtures.Collectors.Gauge in 'Fixtures\Prometheus.Tests.Fixtures.Collectors.Gauge.pas',
   Prometheus.Tests.Fixtures.Collectors.Histogram in 'Fixtures\Prometheus.Tests.Fixtures.Collectors.Histogram.pas',
-  Prometheus.Tests.Fixtures.Exposers.Text in 'Fixtures\Prometheus.Tests.Fixtures.Exposers.Text.pas';
+  Prometheus.Tests.Fixtures.Collectors.Summary in 'Fixtures\Prometheus.Tests.Fixtures.Collectors.Summary.pas',
+  Prometheus.Tests.Fixtures.Exposers.Text in 'Fixtures\Prometheus.Tests.Fixtures.Exposers.Text.pas',
+  Prometheus.Tests.Fixtures.Quantiles in 'Fixtures\Prometheus.Tests.Fixtures.Quantiles.pas';
 
 begin
 {$IFNDEF TESTINSIGHT}

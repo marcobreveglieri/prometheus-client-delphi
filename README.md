@@ -61,7 +61,7 @@ The Prometheus Delphi Client library offers a comprehensive set of features:
   - **Counter** - Cumulative metrics that only increase (requests, errors, etc.)
   - **Gauge** - Metrics that can go up and down (memory usage, connections, etc.)
   - **Histogram** - Distribution of values in configurable buckets (response times, sizes)
-  - **Summary** - *(Under development)* - Quantiles over sliding time windows
+  - **Summary** - Quantiles over sliding time windows with configurable objectives
 
 - **Label Support** - Add context to metrics with key-value pairs for multi-dimensional data
 
@@ -273,7 +273,7 @@ begin
   LGauge.SetDuration(
     procedure
     begin
-      // Your code here - gauge will be set to execution time in seconds
+      // Your code here - gauge will be set to execution time in milliseconds
       ProcessData();
     end);
 end;
@@ -321,6 +321,63 @@ begin
   LHistogram.Observe(0.123);
 end;
 ```
+
+### Summary
+
+A **summary** samples observations and calculates configurable φ-quantiles (e.g. p50/p90/p99) over a sliding time window (default: 10 minutes, split into 5 age buckets), together with a cumulative sum and count of all observed values. Quantiles are estimated on the client side with the CKMS streaming algorithm, so each objective specifies both the quantile rank and its allowed estimation error.
+
+**Use cases**: Request durations and latencies when you need precomputed client-side quantiles
+
+```delphi
+uses
+  Prometheus.Collectors.Summary;
+
+var
+  LSummary: TSummary;
+begin
+  // Create with default objectives: 0.5 ± 0.05, 0.9 ± 0.01, 0.99 ± 0.001
+  LSummary := TSummary.Create(
+    'request_duration_seconds',
+    'HTTP request duration in seconds');
+  LSummary.Register();
+
+  // Record observations
+  LSummary.Observe(0.25);  // 250ms
+
+  // Or time a block of code (records the elapsed seconds)
+  LSummary.ObserveDuration(
+    procedure
+    begin
+      ProcessData();
+    end);
+end;
+```
+
+**With custom objectives, labels and time window**:
+```delphi
+uses
+  Prometheus.Collectors.Summary,
+  Prometheus.Quantiles;
+
+var
+  LSummary: TSummary;
+begin
+  LSummary := TSummary.Create(
+    'api_response_time_seconds',
+    'API response time',
+    [TQuantileObjective.Create(0.95, 0.005),
+     TQuantileObjective.Create(0.99, 0.001)],  // Quantile objectives
+    ['endpoint'],                              // Labels
+    5 * 60 * 1000,                             // Max age: 5 minutes (in milliseconds)
+    5                                          // Age buckets
+  );
+  LSummary.Register();
+
+  LSummary.Labels(['/users']).Observe(0.123);
+end;
+```
+
+Keep in mind that quantile values are reported as `NaN` when no observation falls within the sliding time window, while `_sum` and `_count` are cumulative and unaffected by it. Note also that summaries are more expensive than histograms on the client side and their quantiles cannot be aggregated across instances: prefer histograms when server-side aggregation is needed.
 
 **Learn more**: See [Metric Types](https://github.com/marcobreveglieri/prometheus-client-delphi/wiki/Metric-Types) in the wiki for detailed information, including when to use each type.
 
@@ -618,13 +675,13 @@ The library leverages modern Delphi language features including:
 - Generics
 - Advanced RTTI
 
-While it may work with earlier Delphi versions with modifications, official support and testing target Delphi 11 Alexandria and newer releases.
+While it may work with earlier Delphi versions with modifications, official support and testing target Delphi 11 Alexandria and newer releases. Development and testing are currently carried out on **Delphi 13.1**.
 
 ## Problem? Solved!
 
 | Problem | Solution |
 |---------|----------|
-| **"How do I add metrics to my Delphi app?"** | Ready-to-use metric types: Counter, Gauge, Histogram |
+| **"How do I add metrics to my Delphi app?"** | Ready-to-use metric types: Counter, Gauge, Histogram, Summary |
 | **"How do I export metrics in Prometheus format?"** | Built-in text format exporter compatible with Prometheus |
 | **"How do I add context to my metrics?"** | Label support for multi-dimensional metrics |
 | **"Is it thread-safe?"** | Yes, all operations are thread-safe for multi-threaded apps |

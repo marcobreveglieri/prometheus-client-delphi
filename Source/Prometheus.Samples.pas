@@ -10,7 +10,7 @@ type
 
 { Enums }
 
-  TMetricType = (mtCounter, mtGauge, mtHistogram);
+  TMetricType = (mtCounter, mtGauge, mtHistogram, mtSummary);
 
 { TSample }
 
@@ -72,11 +72,11 @@ type
     /// </summary>
     Samples: TArray<TSample>;
     /// <summary>
-    ///  The sum off all metrics values (used for histograms).
+    ///  The sum off all metrics values (used for histograms and summaries).
     /// </summary>
     MetricSum: Double;
     /// <summary>
-    ///  The count of all observed processes (used for histograms).
+    ///  The count of all observed processes (used for histograms and summaries).
     /// </summary>
     MetricCount: Int64;
     /// <summary>
@@ -94,7 +94,7 @@ type
 
 const
   StrMetricType: array[TMetricType] of string = (
-    'counter', 'gauge', 'histogram'
+    'counter', 'gauge', 'histogram', 'summary'
   );
 
 implementation
