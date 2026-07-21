@@ -11,6 +11,7 @@
   <img alt="Delphi" src="https://img.shields.io/badge/Delphi-11%2B-red?logo=delphi&logoColor=white">
   <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg">
   <img alt="Boss" src="https://img.shields.io/badge/Boss-available-blue">
+  <img alt="Blocks" src="https://img.shields.io/badge/Blocks-available-blueviolet">
 </p>
 
 ## 📑 Table of Contents
@@ -103,6 +104,14 @@ The Prometheus Delphi Client library offers a comprehensive set of features:
 - **Best Practices Built-in** - Follows [Prometheus best practices](https://prometheus.io/docs/practices/) for naming and usage
 
 ## 📦 Installation
+
+### 🧱 Using Blocks Package Manager
+
+[Blocks](https://delphi-blocks.dev) is a package manager for Delphi. If you have Blocks installed:
+
+```bash
+blocks install marcobreveglieri.prometheus-client-delphi
+```
 
 ### 📥 Using Boss Package Manager
 
