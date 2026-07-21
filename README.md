@@ -8,9 +8,9 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/marcobreveglieri/prometheus-client-delphi/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/marcobreveglieri/prometheus-client-delphi"></a>
   <img alt="Delphi" src="https://img.shields.io/badge/Delphi-11%2B-red?logo=delphi&logoColor=white">
   <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg">
-  <img alt="Boss" src="https://img.shields.io/badge/Boss-available-blue">
   <img alt="Blocks" src="https://img.shields.io/badge/Blocks-available-blueviolet">
 </p>
 
