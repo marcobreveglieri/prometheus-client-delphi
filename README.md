@@ -113,14 +113,6 @@ The Prometheus Delphi Client library offers a comprehensive set of features:
 blocks install marcobreveglieri.prometheus-client-delphi
 ```
 
-### 📥 Using Boss Package Manager
-
-[Boss](https://github.com/HashLoad/boss) is a dependency manager for Delphi. If you have Boss installed:
-
-```bash
-boss install marcobreveglieri/prometheus-client-delphi
-```
-
 ### 🛠️ Manual Installation
 
 1. Download or clone the repository from [GitHub](https://github.com/marcobreveglieri/prometheus-client-delphi)
