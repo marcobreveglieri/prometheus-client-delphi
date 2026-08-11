@@ -1,6 +1,8 @@
-<div>
-  <img alt="Prometheus Client for Delphi" height="256" src="https://ucarecdn.com/a7019e45-d14b-47cd-8ceb-70ba7848f049/">
-  <h1>Prometheus Client for Delphi</h1>
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="Assets/Logo/logo-horz-dark-optimized.png">
+    <img alt="Prometheus Client for Delphi" src="Assets/Logo/logo-horz-light-optimized.png" width="720">
+  </picture>
 </div>
 
 <p align="center">
